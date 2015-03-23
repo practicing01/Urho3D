@@ -159,8 +159,8 @@ task :ci do
     $testing = 0
   else
     $configuration = 'Debug'
-    # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build are capable to run tests
-    $testing = (ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) ? 1 : 0
+    # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build; or Emscripten build environment are capable to run tests
+    $testing = (ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) || ENV['EMSCRIPTEN'] ? 1 : 0
     if $testing
       ENV['URHO3D_PREFIX_PATH'] = `pwd`.chomp + '/bin'
     end
@@ -169,7 +169,7 @@ task :ci do
   $build_options = "-DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'URHO3D_TEST_TIMEOUT'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var]
   }
   if ENV['XCODE']

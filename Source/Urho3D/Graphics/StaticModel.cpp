@@ -86,6 +86,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
         Ray localRay = query.ray_.Transformed(inverse);
         float distance = localRay.HitDistance(boundingBox_);
         Vector3 normal = -query.ray_.direction_;
+        unsigned hitBatch = M_MAX_UNSIGNED;
 
         if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
@@ -102,6 +103,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
                     {
                         distance = geometryDistance;
                         normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
+                        hitBatch = i;
                     }
                 }
             }
@@ -115,7 +117,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             result.distance_ = distance;
             result.drawable_ = this;
             result.node_ = node_;
-            result.subObject_ = M_MAX_UNSIGNED;
+            result.subObject_ = hitBatch;
             results.Push(result);
         }
         break;
@@ -125,21 +127,15 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
 void StaticModel::UpdateBatches(const FrameInfo& frame)
 {
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
-    const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
 
-    if (batches_.Size() > 1)
-    {
-        for (unsigned i = 0; i < batches_.Size(); ++i)
-        {
-            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
-            batches_[i].worldTransform_ = &worldTransform;
-        }
-    }
-    else if (batches_.Size() == 1)
-    {
+    if (batches_.Size() == 1)
         batches_[0].distance_ = distance_;
-        batches_[0].worldTransform_ = &worldTransform;
+    else
+    {
+        const Matrix3x4& worldTransform = node_->GetWorldTransform();
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+            batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
     }
 
     float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);
@@ -254,8 +250,10 @@ void StaticModel::SetModel(Model* model)
         SetNumGeometries(model->GetNumGeometries());
         const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
         const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
+        const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : (const Matrix3x4*)0;
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
+            batches_[i].worldTransform_ = worldTransform;
             geometries_[i] = geometries[i];
             geometryData_[i].center_ = geometryCenters[i];
         }

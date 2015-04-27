@@ -81,9 +81,11 @@ namespace Urho3D
 <a href="#Class_FocusParameters"><b>FocusParameters</b></a>
 <a href="#Class_Font"><b>Font</b></a>
 <a href="#Class_Frustum"><b>Frustum</b></a>
+<a href="#Class_Geometry"><b>Geometry</b></a>
 <a href="#Class_Graphics"><b>Graphics</b></a>
 <a href="#Class_HttpRequest"><b>HttpRequest</b></a>
 <a href="#Class_Image"><b>Image</b></a>
+<a href="#Class_IndexBuffer"><b>IndexBuffer</b></a>
 <a href="#Class_Input"><b>Input</b></a>
 <a href="#Class_IntRect"><b>IntRect</b></a>
 <a href="#Class_IntVector2"><b>IntVector2</b></a>
@@ -191,6 +193,7 @@ namespace Urho3D
 <a href="#Class_Vector3"><b>Vector3</b></a>
 <a href="#Class_Vector4"><b>Vector4</b></a>
 <a href="#Class_VectorBuffer"><b>VectorBuffer</b></a>
+<a href="#Class_VertexBuffer"><b>VertexBuffer</b></a>
 <a href="#Class_View3D"><b>View3D</b></a>
 <a href="#Class_Viewport"><b>Viewport</b></a>
 <a href="#Class_Window"><b>Window</b></a>
@@ -1838,19 +1841,13 @@ Methods:
 
 - void SetLayer(int layer)
 - void SetOrderInLayer(int orderInLayer)
-- void SetTexture(Texture2D* texture)
-- void SetBlendMode(BlendMode mode)
 - int GetLayer() const
 - int GetOrderInLayer() const
-- Texture2D* GetTexture() const
-- BlendMode GetBlendMode() const
 
 Properties:
 
 - int layer
 - int orderInLayer
-- Texture2D* texture
-- BlendMode blendMode
 
 <a name="Class_DropDownList"></a>
 ### DropDownList : Menu
@@ -2190,6 +2187,44 @@ Methods:
 - Rect Projected(const Matrix4& transform) const
 - void UpdatePlanes()
 
+<a name="Class_Geometry"></a>
+### Geometry : Object
+
+Methods:
+
+- Geometry() (GC)
+- Geometry* new()
+- void delete()
+- bool SetNumVertexBuffers(unsigned num)
+- bool SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask = MASK_DEFAULT)
+- void SetIndexBuffer(IndexBuffer* buffer)
+- bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange = true)
+- bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, bool checkIllegal = true)
+- void SetLodDistance(float distance)
+- unsigned GetNumVertexBuffers() const
+- VertexBuffer* GetVertexBuffer(unsigned index) const
+- unsigned GetVertexElementMask(unsigned index) const
+- IndexBuffer* GetIndexBuffer() const
+- PrimitiveType GetPrimitiveType() const
+- unsigned GetIndexStart() const
+- unsigned GetIndexCount() const
+- unsigned GetVertexStart() const
+- unsigned GetVertexCount() const
+- float GetLodDistance()
+- bool IsEmpty() const
+
+Properties:
+
+- unsigned numVertexBuffers
+- IndexBuffer* indexBuffer
+- PrimitiveType primitiveType (readonly)
+- unsigned indexStart (readonly)
+- unsigned indexCount (readonly)
+- unsigned vertexStart (readonly)
+- unsigned vertexCount (readonly)
+- float lodDistance
+- bool empty (readonly)
+
 <a name="Class_Graphics"></a>
 ### Graphics : Object
 
@@ -2216,6 +2251,7 @@ Methods:
 - bool IsInitialized() const
 - void* GetExternalWindow() const
 - const String GetWindowTitle() const
+- const String GetApiName() const
 - IntVector2 GetWindowPosition() const
 - int GetWidth() const
 - int GetHeight() const
@@ -2234,13 +2270,11 @@ Methods:
 - unsigned GetDummyColorFormat() const
 - unsigned GetShadowMapFormat() const
 - unsigned GetHiresShadowMapFormat() const
-- bool GetSM3Support() const
 - bool GetInstancingSupport() const
 - bool GetLightPrepassSupport() const
 - bool GetDeferredSupport() const
 - bool GetHardwareShadowSupport() const
 - bool GetReadableDepthSupport() const
-- bool GetStreamOffsetSupport() const
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
 - IntVector2 GetDesktopResolution() const
@@ -2261,11 +2295,13 @@ Methods:
 - unsigned GetDepthStencilFormat()
 - unsigned GetReadableDepthFormat()
 - unsigned GetFormat(const String formatName)
+- unsigned GetMaxBones()
 
 Properties:
 
 - bool initialized (readonly)
 - String windowTitle
+- String apiName (readonly)
 - IntVector2 windowPosition
 - int width (readonly)
 - int height (readonly)
@@ -2284,13 +2320,11 @@ Properties:
 - unsigned dummyColorFormat (readonly)
 - unsigned shadowMapFormat (readonly)
 - unsigned hiresShadowMapFormat (readonly)
-- bool SM3Support (readonly)
 - bool instancingSupport (readonly)
 - bool lightPrepassSupport (readonly)
 - bool deferredSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool readableDepthSupport (readonly)
-- bool streamOffsetSupport (readonly)
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
 - IntVector2 desktopResolution (readonly)
@@ -2365,6 +2399,31 @@ Properties:
 - bool compressed (readonly)
 - CompressedFormat compressedFormat (readonly)
 - unsigned numCompressedLevels (readonly)
+
+<a name="Class_IndexBuffer"></a>
+### IndexBuffer : Object
+
+Methods:
+
+- IndexBuffer() (GC)
+- IndexBuffer* new()
+- void delete()
+- void SetShadowed(bool enable)
+- bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false)
+- bool SetData(VectorBuffer& data)
+- bool SetDataRange(VectorBuffer& data, unsigned start, unsigned count, bool discard = false)
+- VectorBuffer GetData()
+- bool IsShadowed() const
+- bool IsDynamic() const
+- unsigned GetIndexCount() const
+- unsigned GetIndexSize() const
+
+Properties:
+
+- bool shadowed
+- bool dynamic (readonly)
+- unsigned indexCount (readonly)
+- unsigned indexSize (readonly)
 
 <a name="Class_Input"></a>
 ### Input : Object
@@ -2878,6 +2937,7 @@ Methods:
 - void SetUVTransform(const Vector2& offset, float rotation, float repeat)
 - void SetCullMode(CullMode mode)
 - void SetShadowCullMode(CullMode mode)
+- void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
 - void SetScene(Scene* scene)
 - void RemoveShaderParameter(const String name)
@@ -2887,17 +2947,15 @@ Methods:
 - void MarkForAuxView(unsigned frameNumber)
 - unsigned GetNumTechniques() const
 - Technique* GetTechnique(unsigned index) const
-- Pass* GetPass(unsigned index, StringHash passType) const
-- Pass* GetPass(unsigned index, const String passType) const
+- Pass* GetPass(unsigned index, const String passName) const
 - Texture* GetTexture(TextureUnit unit) const
 - ValueAnimation* GetShaderParameterAnimation(const String name) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String name) const
 - float GetShaderParameterAnimationSpeed(const String name) const
 - CullMode GetCullMode() const
 - CullMode GetShadowCullMode() const
+- FillMode GetFillMode() const
 - const BiasParameters& GetDepthBias() const
-- unsigned GetAuxViewFrameNumber() const
-- unsigned GetNumUsedTextureUnits() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
 - Scene* GetScene() const
@@ -2906,8 +2964,7 @@ Properties:
 
 - CullMode cullMode (readonly)
 - CullMode shadowCullMode (readonly)
-- unsigned auxViewFrameNumber (readonly)
-- unsigned numUsedTextureUnits (readonly)
+- FillMode fillMode (readonly)
 - bool occlusion (readonly)
 - bool specular (readonly)
 - Scene* scene
@@ -3126,12 +3183,21 @@ Properties:
 
 Methods:
 
+- Model() (GC)
+- Model* new()
+- void delete()
 - Model* Clone(const String cloneName = String::EMPTY) const
+- void SetBoundingBox(const BoundingBox& box)
+- void SetNumGeometries(unsigned num)
+- bool SetNumGeometryLodLevels(unsigned index, unsigned num)
+- bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
+- bool SetGeometryCenter(unsigned index, const Vector3& center)
 - const BoundingBox& GetBoundingBox() const
 - Skeleton& GetSkeleton()
 - unsigned GetNumGeometries() const
 - unsigned GetNumGeometryLodLevels(unsigned index) const
 - Geometry* GetGeometry(unsigned index, unsigned lodLevel) const
+- const Vector3& GetGeometryCenter(unsigned index) const
 - unsigned GetNumMorphs() const
 - const ModelMorph* GetMorph(const String name) const
 - const ModelMorph* GetMorph(StringHash nameHash) const
@@ -3141,9 +3207,9 @@ Methods:
 
 Properties:
 
-- BoundingBox& boundingBox (readonly)
+- BoundingBox& boundingBox
 - Skeleton skeleton (readonly)
-- unsigned numGeometries (readonly)
+- unsigned numGeometries
 - unsigned numMorphs (readonly)
 
 <a name="Class_Navigable"></a>
@@ -3627,6 +3693,9 @@ Properties:
 
 Methods:
 
+- ParticleEffect() (GC)
+- ParticleEffect* new()
+- void delete()
 - void SetMaterial(Material* material)
 - void SetNumParticles(unsigned num)
 - void SetUpdateInvisible(bool enable)
@@ -3656,8 +3725,18 @@ Methods:
 - void SetMaxRotationSpeed(float speed)
 - void SetSizeAdd(float sizeAdd)
 - void SetSizeMul(float sizeMul)
+- void AddColorTime(const Color& color, const float time)
+- void AddColorFrame(const ColorFrame& colorFrame)
+- void RemoveColorFrame(unsigned index)
 - void SetColorFrame(unsigned index, const ColorFrame& colorFrame)
+- void SetNumColorFrames(unsigned number)
+- void SortColorFrames()
+- void AddTextureTime(const Rect& uv, const float time)
+- void AddTextureFrame(const TextureFrame& textureFrame)
+- void RemoveTextureFrame(unsigned index)
 - void SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
+- void SetNumTextureFrames(unsigned number)
+- void SortTextureFrames()
 - Material* GetMaterial() const
 - unsigned GetNumParticles() const
 - bool GetUpdateInvisible() const
@@ -3760,28 +3839,29 @@ Properties:
 Methods:
 
 - void SetEffect(ParticleEffect2D* effect)
-- ParticleEffect2D* GetEffect() const
 - void SetSprite(Sprite2D* sprite)
+- void SetBlendMode(BlendMode blendMode)
+- ParticleEffect2D* GetEffect() const
 - Sprite2D* GetSprite() const
+- BlendMode GetBlendMode() const
 
 Properties:
 
 - ParticleEffect2D* effect
 - Sprite2D* sprite
+- BlendMode blendMode
 
 <a name="Class_Pass"></a>
 ### Pass : RefCounted
 
 Methods:
 
-- bool IsSM3() const
 - bool IsDesktop() const
 - const String GetVertexShader() const
 - const String GetPixelShader() const
 
 Properties:
 
-- bool SM3 (readonly)
 - bool desktop (readonly)
 - const String vertexShader (readonly)
 - const String pixelShader (readonly)
@@ -4299,7 +4379,6 @@ Methods:
 - void SetMaxShadowMaps(int shadowMaps)
 - void SetDynamicInstancing(bool enable)
 - void SetMinInstances(int instances)
-- void SetMaxInstanceTriangles(int triangles)
 - void SetMaxSortedInstances(int instances)
 - void SetMaxOccluderTriangles(int triangles)
 - void SetOcclusionBufferSize(int size)
@@ -4323,7 +4402,6 @@ Methods:
 - int GetMaxShadowMaps() const
 - bool GetDynamicInstancing() const
 - int GetMinInstances() const
-- int GetMaxInstanceTriangles() const
 - int GetMaxSortedInstances() const
 - int GetMaxOccluderTriangles() const
 - int GetOcclusionBufferSize() const
@@ -4360,7 +4438,6 @@ Properties:
 - int maxShadowMaps
 - bool dynamicInstancing
 - int minInstances
-- int maxInstanceTriangles
 - int maxSortedInstances
 - int maxOccluderTriangles
 - int occlusionBufferSize
@@ -5227,6 +5304,7 @@ Properties:
 Methods:
 
 - void SetSprite(Sprite2D* sprite)
+- void SetBlendMode(BlendMode mode)
 - void SetFlip(bool flipX, bool flipY)
 - void SetFlipX(bool flipX)
 - void SetFlipY(bool flipY)
@@ -5234,23 +5312,28 @@ Methods:
 - void SetAlpha(float alpha)
 - void SetUseHotSpot(bool useHotSpot)
 - void SetHotSpot(const Vector2& hotspot)
+- void SetCustomMaterial(Material* customMaterial)
 - Sprite2D* GetSprite() const
+- BlendMode GetBlendMode() const
 - bool GetFlipX() const
 - bool GetFlipY() const
 - const Color& GetColor() const
 - float GetAlpha() const
 - bool GetUseHotSpot() const
 - const Vector2& GetHotSpot() const
+- Material* GetCustomMaterial() const
 
 Properties:
 
 - Sprite2D* sprite
+- BlendMode blendMode
 - bool flipX
 - bool flipY
 - Color& color
 - float alpha
 - bool useHotSpot
 - Vector2 hotSpot
+- Material* customMaterial
 
 <a name="Class_StringHash"></a>
 ### StringHash
@@ -5286,20 +5369,18 @@ Properties:
 
 Methods:
 
-- bool HasPass(const StringHash type) const
-- Pass* GetPass(const StringHash type) const
-- Pass* GetSupportedPass(const StringHash type) const
+- bool HasPass(const String type) const
+- Pass* GetPass(const String type) const
+- Pass* GetSupportedPass(const String type) const
 - bool IsSupported() const
-- bool IsSM3() const
 - bool IsDesktop() const
 - unsigned GetNumPasses() const
-- const Vector<StringHash>& GetPassTypes() const
+- const Vector<String>& GetPassTypes() const
 - const PODVector<Pass*>& GetPasses() const
 
 Properties:
 
 - bool supported (readonly)
-- bool SM3 (readonly)
 - bool desktop (readonly)
 - unsigned numPasses (readonly)
 
@@ -6197,7 +6278,7 @@ Methods:
 - void SetMatrix3x4(const Matrix3x4& value)
 - void SetMatrix4(const Matrix4& value)
 - int GetInt() const
-- int GetUInt() const
+- unsigned GetUInt() const
 - StringHash GetStringHash()
 - bool GetBool() const
 - float GetFloat() const
@@ -6521,6 +6602,33 @@ Properties:
 - unsigned position (readonly)
 - unsigned size (readonly)
 - bool eof (readonly)
+
+<a name="Class_VertexBuffer"></a>
+### VertexBuffer : Object
+
+Methods:
+
+- VertexBuffer() (GC)
+- VertexBuffer* new()
+- void delete()
+- void SetShadowed(bool enable)
+- bool SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false)
+- bool SetData(VectorBuffer& data)
+- bool SetDataRange(VectorBuffer& data, unsigned start, unsigned count, bool discard = false)
+- VectorBuffer GetData()
+- bool IsShadowed() const
+- bool IsDynamic() const
+- unsigned GetVertexCount() const
+- unsigned GetVertexSize() const
+- unsigned GetElementMask() const
+
+Properties:
+
+- bool shadowed
+- bool dynamic (readonly)
+- unsigned vertexCount (readonly)
+- unsigned vertexSize (readonly)
+- unsigned elementMask (readonly)
 
 <a name="Class_View3D"></a>
 ### View3D : Window
@@ -7069,18 +7177,6 @@ Properties:
 - int SURFACE_UPDATEVISIBLE
 - int SURFACE_UPDATEALWAYS
 
-### ShaderParameterGroup
-
-- int SP_FRAME
-- int SP_CAMERA
-- int SP_VIEWPORT
-- int SP_ZONE
-- int SP_LIGHT
-- int SP_VERTEXLIGHTS
-- int SP_MATERIAL
-- int SP_OBJECTTRANSFORM
-- int MAX_SHADER_PARAMETER_GROUPS
-
 ### ShaderType
 
 - int VS
@@ -7145,18 +7241,6 @@ Properties:
 - int TU_SPECULAR
 - int TU_EMISSIVE
 - int TU_ENVIRONMENT
-- int MAX_MATERIAL_TEXTURE_UNITS
-- int TU_LIGHTRAMP
-- int TU_LIGHTSHAPE
-- int TU_SHADOWMAP
-- int TU_FACESELECT
-- int TU_INDIRECTION
-- int TU_DEPTHBUFFER
-- int TU_LIGHTBUFFER
-- int TU_VOLUMEMAP
-- int TU_ZONE
-- int MAX_NAMED_TEXTURE_UNITS
-- int MAX_TEXTURE_UNITS
 
 ### TextureUsage
 
@@ -7554,6 +7638,21 @@ Properties:
 - int LOG_INFO
 - int LOG_NONE
 - int LOG_WARNING
+- unsigned MASK_BLENDINDICES
+- unsigned MASK_BLENDWEIGHTS
+- unsigned MASK_COLOR
+- unsigned MASK_CUBETEXCOORD1
+- unsigned MASK_CUBETEXCOORD2
+- unsigned MASK_DEFAULT
+- unsigned MASK_INSTANCEMATRIX1
+- unsigned MASK_INSTANCEMATRIX2
+- unsigned MASK_INSTANCEMATRIX3
+- unsigned MASK_NONE
+- unsigned MASK_NORMAL
+- unsigned MASK_POSITION
+- unsigned MASK_TANGENT
+- unsigned MASK_TEXCOORD1
+- unsigned MASK_TEXCOORD2
 - int MAX_VERTEX_LIGHTS
 - int MOUSEB_LEFT
 - int MOUSEB_MIDDLE

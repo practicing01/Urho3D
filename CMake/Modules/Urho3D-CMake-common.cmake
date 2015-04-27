@@ -22,7 +22,7 @@
 
 # Limit the supported build configurations
 set (URHO3D_BUILD_CONFIGURATIONS Release RelWithDebInfo Debug)
-set (DOC_STRING "Choose the build configuration, possible options are: ${URHO3D_BUILD_CONFIGURATIONS}")
+set (DOC_STRING "Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug")
 if (CMAKE_CONFIGURATION_TYPES)
     # For multi-configurations generator, such as VS and Xcode
     set (CMAKE_CONFIGURATION_TYPES ${URHO3D_BUILD_CONFIGURATIONS} CACHE STRING "${DOC_STRING}" FORCE)
@@ -68,7 +68,7 @@ if (ANDROID OR RPI OR EMSCRIPTEN)
     # This build option is not available on Android, Raspberry-Pi, and Emscripten platforms as its value is preset by the chosen toolchain in the build tree
     set (URHO3D_64BIT ${URHO3D_DEFAULT_64BIT})
 else ()
-    option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})
+    option (URHO3D_64BIT "Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system" ${URHO3D_DEFAULT_64BIT})
 endif ()
 cmake_dependent_option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_LUA "Enable additional Lua scripting support")
@@ -114,25 +114,31 @@ option (URHO3D_TESTING "Enable testing support")
 if (URHO3D_TESTING)
     if (EMSCRIPTEN)
         set (DEFAULT_TIMEOUT 10)
-        set (EMSCRIPTEN_EMRUN_BROWSER firefox CACHE STRING "Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), default to firefox")
+        set (EMSCRIPTEN_EMRUN_BROWSER firefox CACHE STRING "Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), use 'emrun --list_browsers' command to get the list of possible values")
     else ()
         set (DEFAULT_TIMEOUT 5)
     endif ()
     set (URHO3D_TEST_TIMEOUT ${DEFAULT_TIMEOUT} CACHE STRING "Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms")
 else ()
     unset (URHO3D_TEST_TIMEOUT CACHE)
-    unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
+    if (EMSCRIPTEN_EMRUN_BROWSER)   # Suppress unused variable warning at the same time
+        unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
+    endif ()
 endif ()
 # The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
 if (MSVC)
     # On MSVC compiler, default to false (i.e. prefers Direct3D)
     # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
-    option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)")
-elseif (WIN32)
+    set (DEFAULT_OPENGL FALSE)
+else ()
     # On non-MSVC compiler on Windows platform, default to true to enable use of OpenGL instead of Direct3D
     # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
-    option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" TRUE)
+    set (DEFAULT_OPENGL TRUE)
 endif ()
+cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" ${DEFAULT_OPENGL} "WIN32" TRUE)      # Force the variable to TRUE when not WIN32
+# On Windows platform Direct3D11 can be optionally chosen
+# Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
+cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
 if (CMAKE_HOST_WIN32 AND NOT DEFINED URHO3D_MKLINK)
     # Test whether the host system is capable of setting up symbolic link
     execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
@@ -162,6 +168,13 @@ endif ()
 if (MINGW AND CMAKE_CROSSCOMPILING)
     set (MINGW_PREFIX "" CACHE STRING "Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)")
     set (MINGW_SYSROOT "" CACHE PATH "Path to MinGW system root (MinGW cross-compiling build only)")
+    # When cross-compiling then we are most probably in Unix-alike host environment which should not have problem to handle long include dirs
+    # This change is required to keep ccache happy because it does not like the CMake generated include response file
+    foreach (lang C CXX)
+        foreach (cat OBJECTS INCLUDES)
+            unset (CMAKE_${lang}_USE_RESPONSE_FILE_FOR_${cat})
+        endforeach ()
+    endforeach ()
 endif ()
 if (RPI)
     if (NOT RPI_SUPPORTED_ABIS)
@@ -197,13 +210,14 @@ if (RPI)
     else ()
         set (RPI_ABI armeabi-v6)
     endif ()
-    set (RPI_ABI ${RPI_ABI} CACHE STRING "Specify target ABI (RPI build only), possible values are armeabi-v6 (*default for RPI 1), armeabi-v7a (*default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4" FORCE)
+    set (RPI_ABI ${RPI_ABI} CACHE STRING "Specify target ABI (RPI build only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4" FORCE)
 endif ()
 if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
     set (EMSCRIPTEN_ROOT_PATH "" CACHE PATH "Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)")
     set (EMSCRIPTEN_SYSROOT "" CACHE PATH "Path to Emscripten system root (Emscripten cross-compiling build only)")
     option (EMSCRIPTEN_ALLOW_MEMORY_GROWTH "Enable memory growing based on application demand (Emscripten cross-compiling build only)")
     math (EXPR EMSCRIPTEN_TOTAL_MEMORY "32 * 1024 * 1024")     # This option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH option is set
+    set (EMSCRIPTEN_TOTAL_MEMORY ${EMSCRIPTEN_TOTAL_MEMORY} CACHE STRING "Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 33554432 (32MB), this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1")
     cmake_dependent_option (EMSCRIPTEN_SHARE_DATA "Enable sharing data file support (Emscripten cross-compiling build only)" FALSE "EMSCRIPTEN" FALSE)
 endif ()
 # Constrain the build option values in cmake-gui, if applicable
@@ -266,10 +280,15 @@ if (URHO3D_LOGGING)
     add_definitions (-DURHO3D_LOGGING)
 endif ()
 
-# If not on Windows platform, enable Unix mode for kNet library and OpenGL graphic back-end
+# If not on Windows platform, enable Unix mode for kNet library
 if (NOT WIN32)
     add_definitions (-DKNET_UNIX)
-    set (URHO3D_OPENGL 1)
+endif ()
+
+# Add definition for Direct3D11
+if (URHO3D_D3D11)
+    set (URHO3D_OPENGL 0)
+    add_definitions (-DURHO3D_D3D11)
 endif ()
 
 # Add definition for OpenGL
@@ -446,6 +465,14 @@ else ()
             # Emscripten-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            # Prior to version 1.31.3 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
+            # before passing on the work to the underlying LLVM/Clang compiler, this has resulted in preprocessing error when enabling the PCH and ccache
+            # (See https://github.com/kripken/emscripten/issues/3365 for more detail)
+            if (EMCC_VERSION VERSION_LESS 1.31.3)
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++03")
+            endif ()
+            set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
+            set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
             if (DEFINED ENV{CI})
                 # Our CI server is slow, so do not optimize and discard all debug info when test building in Debug configuration
                 set (CMAKE_C_FLAGS_DEBUG "-g0")
@@ -470,13 +497,14 @@ else ()
         set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
     endif ()
     if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-        if (CMAKE_GENERATOR STREQUAL Ninja)
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
+        if (CMAKE_GENERATOR STREQUAL Ninja OR "$ENV{USE_CCACHE}")
+            # When ccache support is on, these flags keep the color diagnostics pipe through ccache output and suppress Clang warning due ccache internal preprocessing step
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics -Qunused-arguments")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Qunused-arguments")
         endif ()
         # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
         # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS (or hopefully it will be CentOS :)
-        if (DEFINED ENV{CI} AND "$ENV{LINUX}" STREQUAL 1)
+        if (DEFINED ENV{CI} AND "$ENV{LINUX}")
             add_definitions (-D__extern_always_inline=inline)
         endif ()
     endif ()
@@ -636,11 +664,20 @@ macro (enable_pch HEADER_PATHNAME)
                     COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
             endforeach ()
             # Use the precompiled header file
+            if ($ENV{COVERITY_SCAN_BRANCH})
+                # Coverity scan does not support PCH so workaround by including the actual header file
+                set (ABS_PATH_PCH ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
+            else ()
+                if (NOT XCODE)
+                    set (PCH_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
+                endif ()
+                set (ABS_PATH_PCH ${PCH_DIR}${HEADER_FILENAME})
+            endif ()
             foreach (FILE ${SOURCE_FILES})
                 if (FILE MATCHES \\.cpp$)
                     get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
                     if (NOT NO_PCH)
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${HEADER_FILENAME}")
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${ABS_PATH_PCH}")
                     endif ()
                 endif ()
             endforeach ()
@@ -659,12 +696,6 @@ macro (enable_pch HEADER_PATHNAME)
                 set (TRIGGERS ${HEADER_FILENAME}.${CMAKE_BUILD_TYPE}.pch.trigger)
             endif ()
             list (APPEND SOURCE_FILES ${TRIGGERS})
-            # Ninja-build specific
-            if (CMAKE_GENERATOR STREQUAL Ninja)
-                # The precompiled header is always generated in the current binary dir,
-                # but Ninja project is not able to find it without adding the binary dir to the include search path
-                list (APPEND INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
-            endif ()
         endif ()
     endif ()
 endmacro ()
@@ -822,10 +853,10 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
     else ()
         set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
     endif ()
-    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2 -s NO_EXIT_RUNTIME=1")    # Urho3D uses SDL2 so set it here instead of in the toolchain which potentially could be reused in other projects not using SDL2
-    set (${LINKER_FLAGS}_RELEASE "-s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
+    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
+    set (${LINKER_FLAGS}_RELEASE "${${LINKER_FLAGS}_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
     if (NOT DEFINED ENV{CI})
-        set (${LINKER_FLAGS}_DEBUG -g4)     # Preserve LLVM debug information, show line number debug comments, and generate source maps
+        set (${LINKER_FLAGS}_DEBUG "${${LINKER_FLAGS}_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
     endif ()
     if (URHO3D_TESTING)
         set (${LINKER_FLAGS} "${${LINKER_FLAGS}} --emrun")  # Inject code into the generated Module object to enable capture of stdout, stderr and exit()
@@ -835,6 +866,8 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
         get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
         if (EMCC_OPTION)
             list (APPEND LINK_DEPENDS ${FILE})
+            unset (EMCC_FILE_ALIAS)
+            unset (EMCC_EXCLUDE_FILE)
             if (EMCC_OPTION STREQUAL embed-file OR EMCC_OPTION STREQUAL preload-file)
                 get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
                 get_property (EMCC_EXCLUDE_FILE SOURCE ${FILE} PROPERTY EMCC_EXCLUDE_FILE)
@@ -1084,8 +1117,11 @@ macro (setup_main_executable)
             get_filename_component (NAME ${FILE} NAME)
             list (APPEND PAK_NAMES ${NAME})
         endforeach ()
+        if (CMAKE_BUILD_TYPE STREQUAL Debug AND NOT EMCC_VERSION VERSION_LESS 1.31.4)
+            set (USE_METADATA --use-metadata)
+        endif ()
         add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}.data
-            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache
+            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${USE_METADATA}
             DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMENT "Generating shared data file")
@@ -1094,8 +1130,10 @@ endmacro ()
 
 # Macro for adjusting target output name by dropping _suffix from the target name
 macro (adjust_target_name)
-    string (REGEX REPLACE _.*$ "" OUTPUT_NAME ${TARGET_NAME})
-    set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
+    if (TARGET_NAME MATCHES _.*$)
+        string (REGEX REPLACE _.*$ "" OUTPUT_NAME ${TARGET_NAME})
+        set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
+    endif ()
 endmacro ()
 
 # Macro for setting up a test case
@@ -1107,7 +1145,13 @@ macro (setup_test)
         endif ()
         list (APPEND ARG_OPTIONS -timeout ${URHO3D_TEST_TIMEOUT})
         if (EMSCRIPTEN)
-            math (EXPR EMRUN_TIMEOUT "2 * ${URHO3D_TEST_TIMEOUT}")
+            if (DEFINED ENV{CI})
+                # The latency on Travis CI server could be very high at time, so set it to the maximum allowed by Travis CI before the process being timed out by Travis CI itself
+                set (EMRUN_TIMEOUT 590)     # 10 minutes (Travis CI timeout) - 10 seconds
+            else ()
+                # Non-CI test
+                math (EXPR EMRUN_TIMEOUT "2 * ${URHO3D_TEST_TIMEOUT}")
+            endif ()
             add_test (NAME ${ARG_NAME} COMMAND ${EMRUN} --browser ${EMSCRIPTEN_EMRUN_BROWSER} --timeout ${EMRUN_TIMEOUT} --timeout_returncode 1 --kill_exit ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_NAME}.html ${ARG_OPTIONS})
         else ()
             add_test (NAME ${ARG_NAME} COMMAND ${TARGET_NAME} ${ARG_OPTIONS})
@@ -1417,6 +1461,14 @@ elseif (EMSCRIPTEN)
         string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
         string (REPLACE "<body>" "<body>\n\n<a href=\"http://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"http://urho3d.github.io/assets/images/logo.png\" alt=\"link to http://urho3d.github.io\" height=\"80\" width=\"320\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
         file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
+    endif ()
+elseif (NOT CMAKE_CROSSCOMPILING AND NOT CMAKE_HOST_WIN32 AND "$ENV{USE_CCACHE}")
+    # Warn user if PATH environment variable has not been correctly set for using ccache
+    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0 AND NOT ${CMAKE_C_COMPILER} MATCHES ${CCACHE_SYMLINK})
+        message (WARNING "The lib directory containing the ccache symlinks (${CCACHE_SYMLINK}) has not been added in the PATH environment variable. "
+            "This is required to enable ccache support for native compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
+            "In order to rectify this, the build tree must be regenerated after the PATH environment variable has been adjusted accordingly.")
     endif ()
 endif ()
 

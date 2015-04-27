@@ -29,7 +29,9 @@
 #include "../Graphics/CustomGeometry.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/DecalSet.h"
+#include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
+#include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Light.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Octree.h"
@@ -47,6 +49,7 @@
 #include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
 #include "../Graphics/Skybox.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../Graphics/Zone.h"
 
 #ifdef _MSC_VER
@@ -278,23 +281,26 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     
     engine->RegisterEnum("TextureUnit");
     engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
+    engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_NORMAL", TU_NORMAL);
+    engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_SPECULAR", TU_SPECULAR);
     engine->RegisterEnumValue("TextureUnit", "TU_EMISSIVE", TU_EMISSIVE);
     engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTRAMP", TU_LIGHTRAMP);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTSHAPE", TU_LIGHTSHAPE);
     engine->RegisterEnumValue("TextureUnit", "TU_SHADOWMAP", TU_SHADOWMAP);
+    #ifdef DESKTOP_GRAPHICS
+    engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM1", TU_CUSTOM1);
+    engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM2", TU_CUSTOM2);
+    engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
     engine->RegisterEnumValue("TextureUnit", "TU_FACESELECT", TU_FACESELECT);
     engine->RegisterEnumValue("TextureUnit", "TU_INDIRECTION", TU_INDIRECTION);
-    engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
     engine->RegisterEnumValue("TextureUnit", "TU_ZONE", TU_ZONE);
+    #endif
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
-    engine->RegisterEnumValue("TextureUnit", "MAX_NAMED_TEXTURE_UNITS", MAX_NAMED_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
     
     engine->RegisterObjectType("RenderTargetInfo", sizeof(RenderTargetInfo), asOBJ_VALUE | asOBJ_APP_CLASS_C);
@@ -480,9 +486,11 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("uint GetRGFloat32Format()", asFUNCTION(Graphics::GetRGFloat32Format), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetFloat16Format()", asFUNCTION(Graphics::GetFloat16Format), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetFloat32Format()", asFUNCTION(Graphics::GetFloat32Format), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetLinearDepthFormat()", asFUNCTION(Graphics::GetLinearDepthFormat), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetDepthStencilFormat()", asFUNCTION(Graphics::GetDepthStencilFormat), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetReadableDepthFormat()", asFUNCTION(Graphics::GetReadableDepthFormat), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetFormat(const String&in)", asFUNCTIONPR(Graphics::GetFormat, (const String&), unsigned), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint GetMaxBones()", asFUNCTION(Graphics::GetMaxBones), asCALL_CDECL);
 }
 
 static Material* MaterialClone(const String& cloneName, Material* ptr)
@@ -514,9 +522,9 @@ static void ConstructTechniqueEntry(TechniqueEntry* ptr)
     new(ptr) TechniqueEntry();
 }
 
-static CScriptArray* TechniqueGetPassTypes(const Technique& technique)
+static CScriptArray* TechniqueGetPassNames(const Technique& technique)
 {
-    return VectorToArray<StringHash>(technique.GetPassTypes(), "Array<StringHash>");
+    return VectorToArray<String>(technique.GetPassNames(), "Array<String>");
 }
 
 static CScriptArray* TechniqueGetPasses(const Technique& technique)
@@ -569,6 +577,145 @@ static const TechniqueEntry& MaterialGetTechniqueEntry(unsigned index, Material*
     return ptr->GetTechniqueEntry(index);
 }
 
+static bool VertexBufferSetData(VectorBuffer& src, VertexBuffer* dest)
+{
+    // Make sure there is enough data
+    if (dest->GetVertexCount() && src.GetSize() >= dest->GetVertexCount() * dest->GetVertexSize())
+        return dest->SetData(&src.GetBuffer()[0]);
+    else
+        return false;
+}
+
+static bool VertexBufferSetDataRange(VectorBuffer& src, unsigned start, unsigned count, bool discard, VertexBuffer* dest)
+{
+    // Make sure there is enough data
+    if (dest->GetVertexCount() && src.GetSize() >= count * dest->GetVertexSize())
+        return dest->SetDataRange(&src.GetBuffer()[0], start, count, discard);
+    else
+        return false;
+}
+
+static VectorBuffer VertexBufferGetData(VertexBuffer* src)
+{
+    VectorBuffer ret;
+    void* data = src->Lock(0, src->GetVertexCount(), false);
+
+    if (data)
+    {
+        ret.Write(data, src->GetVertexCount() * src->GetVertexSize());
+        ret.Seek(0);
+        src->Unlock();
+    }
+
+    return ret;
+}
+
+static bool IndexBufferSetData(VectorBuffer& src, IndexBuffer* dest)
+{
+    // Make sure there is enough data
+    if (dest->GetIndexCount() && src.GetSize() >= dest->GetIndexCount() * dest->GetIndexSize())
+        return dest->SetData(&src.GetBuffer()[0]);
+    else
+        return false;
+}
+
+static bool IndexBufferSetDataRange(VectorBuffer& src, unsigned start, unsigned count, bool discard, IndexBuffer* dest)
+{
+    // Make sure there is enough data
+    if (dest->GetIndexCount() && src.GetSize() >= count * dest->GetIndexSize())
+        return dest->SetDataRange(&src.GetBuffer()[0], start, count, discard);
+    else
+        return false;
+}
+
+static VectorBuffer IndexBufferGetData(IndexBuffer* src)
+{
+    VectorBuffer ret;
+    void* data = src->Lock(0, src->GetIndexCount(), false);
+
+    if (data)
+    {
+        ret.Write(data, src->GetIndexCount() * src->GetIndexSize());
+        ret.Seek(0);
+        src->Unlock();
+    }
+
+    return ret;
+}
+
+static void RegisterBuffers(asIScriptEngine* engine)
+{
+    engine->RegisterGlobalProperty("const uint MASK_NONE", (void*)&MASK_NONE);
+    engine->RegisterGlobalProperty("const uint MASK_POSITION", (void*)&MASK_POSITION);
+    engine->RegisterGlobalProperty("const uint MASK_NORMAL", (void*)&MASK_NORMAL);
+    engine->RegisterGlobalProperty("const uint MASK_COLOR", (void*)&MASK_COLOR);
+    engine->RegisterGlobalProperty("const uint MASK_TEXCOORD1", (void*)&MASK_TEXCOORD1);
+    engine->RegisterGlobalProperty("const uint MASK_TEXCOORD2", (void*)&MASK_TEXCOORD2);
+    engine->RegisterGlobalProperty("const uint MASK_CUBETEXCOORD1", (void*)&MASK_CUBETEXCOORD1);
+    engine->RegisterGlobalProperty("const uint MASK_CUBETEXCOORD2", (void*)&MASK_CUBETEXCOORD2);
+    engine->RegisterGlobalProperty("const uint MASK_TANGENT", (void*)&MASK_TANGENT);
+    engine->RegisterGlobalProperty("const uint MASK_BLENDWEIGHTS", (void*)&MASK_BLENDWEIGHTS);
+    engine->RegisterGlobalProperty("const uint MASK_BLENDINDICES", (void*)&MASK_BLENDINDICES);
+    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX1", (void*)&MASK_INSTANCEMATRIX1);
+    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX2", (void*)&MASK_INSTANCEMATRIX2);
+    engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX3", (void*)&MASK_INSTANCEMATRIX3);
+    engine->RegisterGlobalProperty("const uint MASK_DEFAULT", (void*)&MASK_DEFAULT);
+
+    engine->RegisterEnum("PrimitiveType");
+    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_LIST", TRIANGLE_LIST);
+    engine->RegisterEnumValue("PrimitiveType", "LINE_LIST", LINE_LIST);
+    engine->RegisterEnumValue("PrimitiveType", "POINT_LIST", POINT_LIST);
+    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_STRIP", TRIANGLE_STRIP);
+    engine->RegisterEnumValue("PrimitiveType", "LINE_STRIP", LINE_STRIP);
+    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_FAN", TRIANGLE_FAN);
+
+    RegisterObject<VertexBuffer>(engine, "VertexBuffer");
+    RegisterObjectConstructor<VertexBuffer>(engine, "VertexBuffer");
+    engine->RegisterObjectMethod("VertexBuffer", "void SetSize(uint, uint, bool dynamic = false)", asMETHOD(VertexBuffer, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "bool SetData(VectorBuffer&)", asFUNCTION(VertexBufferSetData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VertexBuffer", "bool SetDataRange(VectorBuffer&, uint, uint, bool discard = false)", asFUNCTION(VertexBufferSetDataRange), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VertexBuffer", "VectorBuffer GetData()", asFUNCTION(VertexBufferGetData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VertexBuffer", "void set_shadowed(bool)", asMETHOD(VertexBuffer, SetShadowed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "bool get_shadowed() const", asMETHOD(VertexBuffer, IsShadowed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "bool get_dynamic() const", asMETHOD(VertexBuffer, IsDynamic), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexCount() const", asMETHOD(VertexBuffer, GetVertexCount), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexSize() const", asMETHODPR(VertexBuffer, GetVertexSize, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint get_elementMask() const", asMETHOD(VertexBuffer, GetElementMask), asCALL_THISCALL);
+
+    RegisterObject<IndexBuffer>(engine, "IndexBuffer");
+    RegisterObjectConstructor<IndexBuffer>(engine, "IndexBuffer");
+    engine->RegisterObjectMethod("IndexBuffer", "void SetSize(uint, bool, bool dynamic = false)", asMETHOD(IndexBuffer, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool SetData(VectorBuffer&)", asFUNCTION(IndexBufferSetData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("IndexBuffer", "bool SetDataRange(VectorBuffer&, uint, uint, bool discard = false)", asFUNCTION(IndexBufferSetDataRange), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("IndexBuffer", "VectorBuffer GetData()", asFUNCTION(IndexBufferGetData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("IndexBuffer", "void set_shadowed(bool)", asMETHOD(IndexBuffer, SetShadowed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool get_shadowed() const", asMETHOD(IndexBuffer, IsShadowed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "bool get_dynamic() const", asMETHOD(IndexBuffer, IsDynamic), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "uint get_indexCount() const", asMETHOD(IndexBuffer, GetIndexCount), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IndexBuffer", "uint get_indexSize() const", asMETHOD(IndexBuffer, GetIndexSize), asCALL_THISCALL);
+
+    RegisterObject<Geometry>(engine, "Geometry");
+    RegisterObjectConstructor<Geometry>(engine, "Geometry");
+    engine->RegisterObjectMethod("Geometry", "void set_numVertexBuffers(uint)", asMETHOD(Geometry, SetNumVertexBuffers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "uint get_numVertexBuffers() const", asMETHOD(Geometry, GetNumVertexBuffers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "bool SetVertexBuffer(uint, VertexBuffer@+, uint elementMask = MASK_DEFAULT)", asMETHOD(Geometry, SetVertexBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "void SetIndexBuffer(IndexBuffer@+)", asMETHOD(Geometry, SetIndexBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "bool SetDrawRange(PrimitiveType, uint, uint, bool getUsedVertexRange = true)", asMETHODPR(Geometry, SetDrawRange, (PrimitiveType, unsigned, unsigned, bool), bool),asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool checkIllegal = true)", asMETHODPR(Geometry, SetDrawRange, (PrimitiveType, unsigned, unsigned, unsigned, unsigned, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "VertexBuffer@+ get_vertexBuffers(uint) const", asMETHOD(Geometry, GetVertexBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "uint get_vertexElementMasks(uint) const", asMETHOD(Geometry, GetVertexElementMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "void set_indexBuffer(IndexBuffer@+)", asMETHOD(Geometry, SetIndexBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "IndexBuffer@+ get_indexBuffer() const", asMETHOD(Geometry, GetIndexBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "PrimitiveType get_primitiveType() const", asMETHOD(Geometry, GetPrimitiveType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "uint get_indexStart() const", asMETHOD(Geometry, GetIndexStart), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "uint get_indexCount() const", asMETHOD(Geometry, GetIndexCount), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "uint get_vertexStart() const", asMETHOD(Geometry, GetVertexStart), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "uint get_vertexCount() const", asMETHOD(Geometry, GetVertexCount), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "void set_lodDistance(float)", asMETHOD(Geometry, SetLodDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "float get_lodDistance() const", asMETHOD(Geometry, GetLodDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "bool get_empty() const", asMETHOD(Geometry, IsEmpty), asCALL_THISCALL);
+}
+
 static void RegisterMaterial(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
@@ -619,8 +766,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pass", "bool get_depthWrite() const", asMETHOD(Pass, GetDepthWrite), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_alphaMask(bool)", asMETHOD(Pass, SetAlphaMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "bool get_alphaMask() const", asMETHOD(Pass, GetAlphaMask), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pass", "void set_sm3(bool)", asMETHOD(Technique, SetIsSM3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pass", "bool get_sm3() const", asMETHOD(Technique, IsSM3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_desktop(bool)", asMETHOD(Technique, SetIsDesktop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "bool get_desktop() const", asMETHOD(Technique, IsDesktop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_vertexShader(const String&in)", asMETHOD(Pass, SetVertexShader), asCALL_THISCALL);
@@ -633,18 +778,16 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pass", "const String& get_pixelShaderDefines() const", asMETHOD(Pass, GetPixelShaderDefines), asCALL_THISCALL);
     
     RegisterResource<Technique>(engine, "Technique");
-    engine->RegisterObjectMethod("Technique", "Pass@+ CreatePass(StringHash)", asMETHOD(Technique, CreatePass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "void RemovePass(StringHash)", asMETHOD(Technique, RemovePass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "bool HasPass(StringHash) const", asMETHOD(Technique, HasPass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Pass@+ GetPass(StringHash)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Pass@+ GetSupportedPass(StringHash)", asMETHOD(Technique, GetSupportedPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ CreatePass(const String&in)", asMETHOD(Technique, CreatePass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "void RemovePass(const String&in)", asMETHOD(Technique, RemovePass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "bool HasPass(const String&in) const", asMETHODPR(Technique, HasPass, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ GetPass(const String&in)", asMETHODPR(Technique, GetPass, (const String&) const, Pass*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ GetSupportedPass(const String&in)", asMETHODPR(Technique, GetSupportedPass, (const String&) const, Pass*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "bool get_supported() const", asMETHOD(Technique, IsSupported), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "void set_sm3(bool)", asMETHOD(Technique, SetIsSM3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "bool get_sm3() const", asMETHOD(Technique, IsSM3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "void set_desktop(bool)", asMETHOD(Technique, SetIsDesktop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "bool get_desktop() const", asMETHOD(Technique, IsDesktop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "uint get_numPasses() const", asMETHOD(Technique, GetNumPasses), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Array<StringHash>@ get_passTypes() const", asFUNCTION(TechniqueGetPassTypes), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Technique", "Array<String>@ get_passNames() const", asFUNCTION(TechniqueGetPassNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Technique", "Array<Pass@>@ get_passes() const", asFUNCTION(TechniqueGetPasses), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("TechniqueEntry", sizeof(TechniqueEntry), asOBJ_VALUE | asOBJ_APP_CLASS_CD);
@@ -666,6 +809,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "void RemoveShaderParameter(const String&in)", asMETHOD(Material, RemoveShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SortTechniques()", asMETHOD(Material, SortTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Material@ Clone(const String&in cloneName = String()) const", asFUNCTION(MaterialClone), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Material", "Pass@+ GetPass(uint, const String&in)", asMETHOD(Material, GetPass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_techniques(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
@@ -686,9 +830,10 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "CullMode get_cullMode() const", asMETHOD(Material, GetCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_shadowCullMode(CullMode)", asMETHOD(Material, SetShadowCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "CullMode get_shadowCullMode() const", asMETHOD(Material, GetShadowCullMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_fillMode(FillMode)", asMETHOD(Material, SetFillMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "FillMode get_fillMode() const", asMETHOD(Material, GetFillMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_depthBias(const BiasParameters&in)", asMETHOD(Material, SetDepthBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const BiasParameters& get_depthBias() const", asMETHOD(Material, GetDepthBias), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "uint get_numUsedTextureUnits() const", asMETHOD(Material, GetNumUsedTextureUnits), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_scene(Scene@+)", asMETHOD(Material, SetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Scene@+ get_scene() const", asMETHOD(Material, GetScene), asCALL_THISCALL);
     
@@ -708,10 +853,17 @@ static void RegisterModel(asIScriptEngine* engine)
 {
     RegisterResource<Model>(engine, "Model");
     engine->RegisterObjectMethod("Model", "Model@ Clone(const String&in cloneName = String()) const", asFUNCTION(ModelClone), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Model", "bool SetGeometry(uint, uint, Geometry@+)", asMETHOD(Model, SetGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Model", "Geometry@+ GetGeometry(uint, uint) const", asMETHOD(Model, GetGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Model", "void set_boundingBox(const BoundingBox&in)", asMETHOD(Model, SetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "const BoundingBox& get_boundingBox() const", asMETHOD(Model, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "Skeleton@+ get_skeleton()", asMETHOD(Model, GetSkeleton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Model", "void set_numGeometries(uint)", asMETHOD(Model, SetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint get_numGeometries() const", asMETHOD(Model, GetNumGeometries), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Model", "bool set_numGeometryLodLevels(uint, uint)", asMETHOD(Model, SetNumGeometryLodLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint get_numGeometryLodLevels(uint) const", asMETHOD(Model, GetNumGeometryLodLevels), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Model", "bool set_geometryCenters(uint, const Vector3&in)", asMETHOD(Model, SetGeometryCenter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Model", "const Vector3& get_geometryCenters(uint) const", asMETHOD(Model, GetGeometryCenter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint get_numMorphs() const", asMETHOD(Model, GetNumMorphs), asCALL_THISCALL);
 }
 
@@ -1208,14 +1360,6 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
 
 static void RegisterCustomGeometry(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("PrimitiveType");
-    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_LIST", TRIANGLE_LIST);
-    engine->RegisterEnumValue("PrimitiveType", "LINE_LIST", LINE_LIST);
-    engine->RegisterEnumValue("PrimitiveType", "POINT_LIST", POINT_LIST);
-    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_STRIP", TRIANGLE_STRIP);
-    engine->RegisterEnumValue("PrimitiveType", "LINE_STRIP", LINE_STRIP);
-    engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_FAN", TRIANGLE_FAN);
-    
     engine->RegisterObjectType("CustomGeometryVertex", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("CustomGeometryVertex", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("CustomGeometryVertex", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
@@ -1355,6 +1499,7 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "void PrecacheShaders(VectorBuffer&)", asFUNCTION(GraphicsPrecacheShadersVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Graphics", "void set_windowTitle(const String&in)", asMETHOD(Graphics, SetWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "const String& get_windowTitle() const", asMETHOD(Graphics, GetWindowTitle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "const String& get_apiName() const", asMETHOD(Graphics, GetApiName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void set_windowIcon(Image@+)", asMETHOD(Graphics, SetWindowIcon), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void set_windowPosition(const IntVector2&in)", asMETHODPR(Graphics, SetWindowPosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "IntVector2 get_windowPosition() const", asMETHOD(Graphics, GetWindowPosition), asCALL_THISCALL);
@@ -1376,7 +1521,6 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "bool get_deviceLost() const", asMETHOD(Graphics, IsDeviceLost), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "uint get_numPrimitives() const", asMETHOD(Graphics, GetNumPrimitives), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "uint get_numBatches() const", asMETHOD(Graphics, GetNumBatches), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Graphics", "bool get_sm3Support() const", asMETHOD(Graphics, GetSM3Support), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_instancingSupport() const", asMETHOD(Graphics, GetInstancingSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_lightPrepassSupport() const", asMETHOD(Graphics, GetLightPrepassSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_deferredSupport() const", asMETHOD(Graphics, GetDeferredSupport), asCALL_THISCALL);
@@ -1384,8 +1528,6 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "bool get_readableDepthSupport() const", asMETHOD(Graphics, GetReadableDepthSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_sRGBSupport() const", asMETHOD(Graphics, GetSRGBSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_sRGBWriteSupport() const", asMETHOD(Graphics, GetSRGBWriteSupport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Graphics", "void set_forceSM2(bool)", asMETHOD(Graphics, SetForceSM2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Graphics", "bool get_forceSM2() const", asMETHOD(Graphics, GetForceSM2), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "Array<IntVector2>@ get_resolutions() const", asFUNCTION(GraphicsGetResolutions), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Graphics", "Array<int>@ get_multiSampleLevels() const", asFUNCTION(GraphicsGetMultiSampleLevels), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Graphics", "IntVector2 get_desktopResolution() const", asMETHOD(Graphics, GetDesktopResolution), asCALL_THISCALL);
@@ -1449,8 +1591,6 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "bool get_dynamicInstancing() const", asMETHOD(Renderer, GetDynamicInstancing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_minInstances(int)", asMETHOD(Renderer, SetMinInstances), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_minInstances() const", asMETHOD(Renderer, GetMinInstances), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_maxInstanceTriangles(int)", asMETHOD(Renderer, SetMaxInstanceTriangles), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "int get_maxInstanceTriangles() const", asMETHOD(Renderer, GetMaxInstanceTriangles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_maxSortedInstances(int)", asMETHOD(Renderer, SetMaxSortedInstances), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_maxSortedInstances() const", asMETHOD(Renderer, GetMaxSortedInstances), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_maxOccluderTriangles(int)", asMETHOD(Renderer, SetMaxOccluderTriangles), asCALL_THISCALL);
@@ -1630,6 +1770,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterRenderPath(engine);
     RegisterTextures(engine);
     RegisterMaterial(engine);
+    RegisterBuffers(engine);
     RegisterModel(engine);
     RegisterAnimation(engine);
     RegisterDrawable(engine);

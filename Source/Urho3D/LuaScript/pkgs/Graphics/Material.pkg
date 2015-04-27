@@ -19,6 +19,7 @@ class Material : public Resource
     void SetUVTransform(const Vector2& offset, float rotation, float repeat);
     void SetCullMode(CullMode mode);
     void SetShadowCullMode(CullMode mode);
+    void SetFillMode(FillMode mode);
     void SetDepthBias(const BiasParameters& parameters);
     void SetScene(Scene* scene);
     void RemoveShaderParameter(const String name);
@@ -33,9 +34,8 @@ class Material : public Resource
     unsigned GetNumTechniques() const;
     
     Technique* GetTechnique(unsigned index) const;
-    
-    Pass* GetPass(unsigned index, StringHash passType) const;
-    Pass* GetPass(unsigned index, const String passType) const;
+
+    Pass* GetPass(unsigned index, const String passName) const;
     
     Texture* GetTexture(TextureUnit unit) const;
     ValueAnimation* GetShaderParameterAnimation(const String name) const;
@@ -44,17 +44,15 @@ class Material : public Resource
     
     CullMode GetCullMode() const;
     CullMode GetShadowCullMode() const;
+    FillMode GetFillMode() const;
     const BiasParameters& GetDepthBias() const;
-    unsigned GetAuxViewFrameNumber() const;
-    unsigned GetNumUsedTextureUnits() const;
     bool GetOcclusion() const;
     bool GetSpecular() const;
     Scene* GetScene() const;
 
     tolua_readonly tolua_property__get_set CullMode cullMode;
     tolua_readonly tolua_property__get_set CullMode shadowCullMode;
-    tolua_readonly tolua_property__get_set unsigned auxViewFrameNumber;
-    tolua_readonly tolua_property__get_set unsigned numUsedTextureUnits;
+    tolua_readonly tolua_property__get_set FillMode fillMode;
     tolua_readonly tolua_property__get_set bool occlusion;
     tolua_readonly tolua_property__get_set bool specular;
     tolua_property__get_set Scene* scene;

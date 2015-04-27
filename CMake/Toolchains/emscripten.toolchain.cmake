@@ -42,11 +42,38 @@ if (NOT EXISTS ${EMSCRIPTEN_ROOT_PATH}/emcc)
     message (FATAL_ERROR "Could not find Emscripten cross compilation tool. "
         "Use EMSCRIPTEN_ROOT_PATH environment variable or build option to specify the location of the toolchain.")
 endif ()
+if (NOT EMCC_VERSION)
+    execute_process (COMMAND ${EMSCRIPTEN_ROOT_PATH}/emcc --version RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE EMCC_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0)
+        string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" EMCC_VERSION ${EMCC_VERSION})
+    endif ()
+    set (EMCC_VERSION ${EMCC_VERSION} CACHE STRING "emcc version being used in this build tree")    # Cache the result even when there was error in determining the version
+endif ()
 if (CMAKE_HOST_WIN32)
     set (TOOL_EXT .bat)
 endif ()
-set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT}     CACHE PATH "C compiler")
-set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++${TOOL_EXT}     CACHE PATH "C++ compiler")
+set (COMPILER_PATH ${EMSCRIPTEN_ROOT_PATH})
+# ccache support could only be enabled for emcc prior to 1.31.3 when the CCACHE_CPP2 env var is also set to 1, newer emcc version could enable ccache support without this caveat (see https://github.com/kripken/emscripten/issues/3365 for more detail)
+# The CCACHE_CPP2 env var tells ccache to fallback to use original input source file instead of preprocessed one when passing on the compilation task to the compiler proper
+if (NOT CMAKE_C_COMPILER AND "$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND ("$ENV{CCACHE_CPP2}" OR NOT EMCC_VERSION VERSION_LESS 1.31.3))
+    if (NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH})
+        message (FATAL_ERROR "The bin directory containing the compiler toolchain (${EMSCRIPTEN_ROOT_PATH}) has not been added in the PATH environment variable. "
+            "This is required to enable ccache support for Emscripten compiler toolchain.")
+    endif ()
+    execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0)
+        foreach (name emcc em++)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${name})
+        endforeach ()
+        set (COMPILER_PATH ${CMAKE_BINARY_DIR})
+    else ()
+        message (WARNING "ccache may not have been installed on this host system. "
+            "This is required to enable ccache support for Emscripten compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
+            "In order to rectify this, the build tree must be regenerated after installing ccache.")
+    endif ()
+endif ()
+set (CMAKE_C_COMPILER   ${COMPILER_PATH}/emcc${TOOL_EXT}            CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${COMPILER_PATH}/em++${TOOL_EXT}            CACHE PATH "C++ compiler")
 set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${TOOL_EXT}     CACHE PATH "archive")
 set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${TOOL_EXT} CACHE PATH "ranlib")
 # Specific to Emscripten
@@ -81,10 +108,8 @@ set (CMAKE_C_COMPILER_ID Clang)
 set (CMAKE_CXX_COMPILER_ID_RUN TRUE)
 set (CMAKE_CXX_COMPILER_ID Clang)
 
-# Set additional linker flags to consider unresolved symbols as an error
-set (CMAKE_EXE_LINKER_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
 # Set required compiler flags for internal CMake various check_xxx() macros which rely on the error to occur for the check to be performed correctly
-set (CMAKE_REQUIRED_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
+set (CMAKE_REQUIRED_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
 
 # Use response files on Windows host
 if (CMAKE_HOST_WIN32)

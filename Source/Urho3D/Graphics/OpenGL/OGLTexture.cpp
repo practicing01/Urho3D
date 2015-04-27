@@ -36,7 +36,7 @@
 namespace Urho3D
 {
 
-GLenum glWrapModes[] =
+static GLenum glWrapModes[] =
 {
     GL_REPEAT,
     GL_MIRRORED_REPEAT,
@@ -47,6 +47,16 @@ GLenum glWrapModes[] =
     GL_CLAMP_TO_EDGE
     #endif
 };
+
+#ifndef GL_ES_VERSION_2_0
+static GLenum gl3WrapModes[] =
+{
+    GL_REPEAT,
+    GL_MIRRORED_REPEAT,
+    GL_CLAMP_TO_EDGE,
+    GL_CLAMP_TO_BORDER
+};
+#endif
 
 static const char* addressModeNames[] =
 {
@@ -66,6 +76,15 @@ static const char* filterModeNames[] =
     "default",
     0
 };
+
+static GLenum GetWrapMode(TextureAddressMode mode)
+{
+    #ifndef GL_ES_VERSION_2_0
+    return Graphics::GetGL3Support() ? gl3WrapModes[mode] : glWrapModes[mode];
+    #else
+    return glWrapModes[mode];
+    #endif
+}
 
 Texture::Texture(Context* context) :
     Resource(context),
@@ -170,10 +189,10 @@ void Texture::UpdateParameters()
         return;
     
     // Wrapping
-    glTexParameteri(target_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[COORD_U]]);
-    glTexParameteri(target_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[COORD_V]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_S, GetWrapMode(addressMode_[COORD_U]));
+    glTexParameteri(target_, GL_TEXTURE_WRAP_T, GetWrapMode(addressMode_[COORD_V]));
     #ifndef GL_ES_VERSION_2_0
-    glTexParameteri(target_, GL_TEXTURE_WRAP_R, glWrapModes[addressMode_[COORD_W]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_R, GetWrapMode(addressMode_[COORD_W]));
     #endif
     
     TextureFilterMode filterMode = filterMode_;
@@ -239,14 +258,10 @@ int Texture::GetMipsToSkip(int quality) const
 
 bool Texture::IsCompressed() const
 {
-    #ifndef GL_ES_VERSION_2_0
     return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
-        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    #else
-    return format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_ETC1_RGB8_OES ||
+        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT || format_ == GL_ETC1_RGB8_OES ||
         format_ == COMPRESSED_RGB_PVRTC_4BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_4BPPV1_IMG ||
         format_ == COMPRESSED_RGB_PVRTC_2BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-    #endif
 }
 
 int Texture::GetLevelWidth(unsigned level) const
@@ -310,10 +325,17 @@ unsigned Texture::GetRowDataSize(int width) const
     case GL_LUMINANCE32F_ARB:
     case GL_DEPTH24_STENCIL8_EXT:
     case GL_RG16:
+    case GL_R32F:
     #endif
         return width * 4;
         
     #ifndef GL_ES_VERSION_2_0
+    case GL_R8:
+        return width;
+
+    case GL_RG8:
+        return width * 2;
+
     case GL_RGBA16:
         return width * 8;
         
@@ -325,11 +347,10 @@ unsigned Texture::GetRowDataSize(int width) const
     case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
         return ((width + 3) >> 2) * 8;
         
-    #ifndef GL_ES_VERSION_2_0
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
         return ((width + 3) >> 2) * 16;
-    #else
+
     case GL_ETC1_RGB8_OES:
         return ((width + 3) >> 2) * 8;
         
@@ -340,8 +361,7 @@ unsigned Texture::GetRowDataSize(int width) const
     case COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
     case COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
         return (width * 2 + 7) >> 3;
-    #endif
-        
+
     default:
         return 0;
     }
@@ -358,7 +378,9 @@ unsigned Texture::GetExternalFormat(unsigned format)
         return GL_LUMINANCE;
     else if (format == GL_SLUMINANCE_ALPHA_EXT)
         return GL_LUMINANCE_ALPHA;
-    else if (format == GL_RG16 || format == GL_RG16F || format == GL_RG32F)
+    else if (format == GL_R8 || format == GL_R32F)
+        return GL_RED;
+    else if (format == GL_RG8 || format == GL_RG16 || format == GL_RG16F || format == GL_RG32F)
         return GL_RG;
     else if (format == GL_RGBA16 || format == GL_RGBA16F_ARB || format == GL_RGBA32F_ARB || format == GL_SRGB_ALPHA_EXT)
         return GL_RGBA;
@@ -379,7 +401,7 @@ unsigned Texture::GetDataType(unsigned format)
     else if (format == GL_RG16 || format == GL_RGBA16)
         return GL_UNSIGNED_SHORT;
     else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB || format == GL_RGBA16F_ARB ||
-        format == GL_RGBA32F_ARB || format == GL_RG16F || format == GL_RG32F)
+        format == GL_RGBA32F_ARB || format == GL_RG16F || format == GL_RG32F || format == GL_R32F)
         return GL_FLOAT;
     else
         return GL_UNSIGNED_BYTE;

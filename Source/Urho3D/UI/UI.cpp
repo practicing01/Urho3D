@@ -88,8 +88,6 @@ UI::UI(Context* context) :
     lastMouseButtons_(0),
     qualifiers_(0),
     maxFontTextureSize_(DEFAULT_FONT_TEXTURE_MAX_SIZE),
-    dragElementsCount_(0),
-    dragConfirmedCount_(0),
     initialized_(false),
     usingTouchInput_(false),
     #ifdef WIN32
@@ -105,7 +103,10 @@ UI::UI(Context* context) :
     #endif
     useMutableGlyphs_(false),
     forceAutoHint_(false),
-    nonModalBatchSize_(0)
+    uiRendered_(false),
+    nonModalBatchSize_(0),
+    dragElementsCount_(0),
+    dragConfirmedCount_(0)
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
     rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);
@@ -691,6 +692,7 @@ void UI::Initialize()
     PROFILE(InitUI);
 
     graphics_ = graphics;
+    UIBatch::posAdjust = Vector3(Graphics::GetPixelUVOffset(), 0.0f);
 
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     rootModalElement_->SetSize(rootElement_->GetSize());
@@ -762,7 +764,6 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
     graphics_->SetCullMode(CULL_CCW);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
-    graphics_->SetDrawAntialiased(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
     if (resetRenderTargets)
@@ -806,7 +807,7 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
         }
 
         graphics_->SetShaders(vs, ps);
-        if (graphics_->NeedParameterUpdate(SP_OBJECTTRANSFORM, this))
+        if (graphics_->NeedParameterUpdate(SP_OBJECT, this))
             graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
         if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);

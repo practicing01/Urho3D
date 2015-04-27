@@ -74,18 +74,18 @@ if (URHO3D_NAVIGATION)
     add_subdirectory (ThirdParty/Recast)
 endif ()
 
-if (URHO3D_PHYSICS)
-    add_subdirectory (ThirdParty/Bullet)
-endif ()
-
 if (URHO3D_URHO2D)
     add_subdirectory (ThirdParty/Box2D)
+endif ()
+
+if (URHO3D_PHYSICS)
+    add_subdirectory (ThirdParty/Bullet)
 endif ()
 
 if (NOT IOS AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
-    else ()
+    elseif (NOT URHO3D_D3D11)
         add_subdirectory (ThirdParty/MojoShader)
     endif ()
     add_subdirectory (ThirdParty/LibCpuId)

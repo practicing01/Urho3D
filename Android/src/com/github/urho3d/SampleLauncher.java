@@ -45,7 +45,8 @@ public class SampleLauncher extends ListActivity {
         startActivityForResult(new Intent(this, Urho3D.class).putExtra(PICKED_LIBRARY, getIntent().getStringExtra(PICKED_LIBRARY)), OBTAINING_LIBNAMES);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Prepare a list view for picking the sample library names
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.samples_list_text_view);

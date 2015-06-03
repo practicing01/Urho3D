@@ -261,6 +261,25 @@ static RenderPathCommand* RenderPathGetCommand(unsigned index, RenderPath* ptr)
 
 static void RegisterRenderPath(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("BlendMode");
+    engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
+    engine->RegisterEnumValue("BlendMode", "BLEND_ADD", BLEND_ADD);
+    engine->RegisterEnumValue("BlendMode", "BLEND_MULTIPLY", BLEND_MULTIPLY);
+    engine->RegisterEnumValue("BlendMode", "BLEND_ALPHA", BLEND_ALPHA);
+    engine->RegisterEnumValue("BlendMode", "BLEND_ADDALPHA", BLEND_ADDALPHA);
+    engine->RegisterEnumValue("BlendMode", "BLEND_PREMULALPHA", BLEND_PREMULALPHA);
+    engine->RegisterEnumValue("BlendMode", "BLEND_INVDESTALPHA", BLEND_INVDESTALPHA);
+    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACT", BLEND_SUBTRACT);
+    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACTALPHA", BLEND_SUBTRACTALPHA);
+
+    engine->RegisterEnum("CubeMapFace");
+    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_X", FACE_POSITIVE_X);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_X", FACE_NEGATIVE_X);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Y", FACE_POSITIVE_Y);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Y", FACE_NEGATIVE_Y);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Z", FACE_POSITIVE_Z);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Z", FACE_NEGATIVE_Z);
+
     engine->RegisterEnum("RenderCommandType");
     engine->RegisterEnumValue("RenderCommandType", "CMD_NONE", CMD_NONE);
     engine->RegisterEnumValue("RenderCommandType", "CMD_CLEAR", CMD_CLEAR);
@@ -302,6 +321,10 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     #endif
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
+
+    engine->RegisterGlobalProperty("uint CLEAR_COLOR", (void*)&CLEAR_COLOR);
+    engine->RegisterGlobalProperty("uint CLEAR_DEPTH", (void*)&CLEAR_DEPTH);
+    engine->RegisterGlobalProperty("uint CLEAR_STENCIL", (void*)&CLEAR_STENCIL);
     
     engine->RegisterObjectType("RenderTargetInfo", sizeof(RenderTargetInfo), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRenderTargetInfo), asCALL_CDECL_OBJLAST);
@@ -314,6 +337,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RenderTargetInfo", "Vector2 size", offsetof(RenderTargetInfo, size_));
     engine->RegisterObjectProperty("RenderTargetInfo", "RenderTargetSizeMode sizeMode", offsetof(RenderTargetInfo, sizeMode_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool enabled", offsetof(RenderTargetInfo, enabled_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "bool cubemap", offsetof(RenderTargetInfo, cubemap_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool filtered", offsetof(RenderTargetInfo, filtered_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool sRGB", offsetof(RenderTargetInfo, sRGB_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool persistent", offsetof(RenderTargetInfo, persistent_));
@@ -323,6 +347,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_CONSTRUCT, "void f(const RenderPathCommand&in)", asFUNCTION(ConstructRenderPathCommandCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructRenderPathCommand), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("RenderPathCommand", "void RemoveShaderParameter(const String&in)", asMETHOD(RenderPathCommand, RemoveShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "void SetOutput(uint, const String&in, CubeMapFace face = FACE_POSITIVE_X)", asMETHOD(RenderPathCommand, SetOutput), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "RenderPathCommand& opAssign(const RenderPathCommand&in)", asMETHODPR(RenderPathCommand, operator =, (const RenderPathCommand&), RenderPathCommand&), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_textureNames(TextureUnit, const String&in)", asMETHOD(RenderPathCommand, SetTextureName), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "const String& get_textureNames(TextureUnit) const", asMETHOD(RenderPathCommand, GetTextureName), asCALL_THISCALL);
@@ -332,6 +357,8 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderPathCommand", "uint get_numOutputs() const", asMETHOD(RenderPathCommand, GetNumOutputs), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_outputNames(uint, const String&in)", asMETHOD(RenderPathCommand, SetOutputName), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "const String& get_outputNames(uint) const", asMETHOD(RenderPathCommand, GetOutputName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "void set_outputFaces(uint, CubeMapFace)", asMETHOD(RenderPathCommand, SetOutputFace), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "CubeMapFace get_outputFaces(uint) const", asMETHOD(RenderPathCommand, GetOutputFace), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_depthStencilName(const String&in)", asMETHOD(RenderPathCommand, SetDepthStencilName), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "const String& get_depthStencilName() const", asMETHOD(RenderPathCommand, GetDepthStencilName), asCALL_THISCALL);
     engine->RegisterObjectProperty("RenderPathCommand", "String tag", offsetof(RenderPathCommand, tag_));
@@ -343,6 +370,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RenderPathCommand", "Color clearColor", offsetof(RenderPathCommand, clearColor_));
     engine->RegisterObjectProperty("RenderPathCommand", "float clearDepth", offsetof(RenderPathCommand, clearDepth_));
     engine->RegisterObjectProperty("RenderPathCommand", "uint clearStencil", offsetof(RenderPathCommand, clearStencil_));
+    engine->RegisterObjectProperty("RenderPathCommand", "BlendMode blendMode", offsetof(RenderPathCommand, blendMode_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool enabled", offsetof(RenderPathCommand, enabled_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool useFogColor", offsetof(RenderPathCommand, useFogColor_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool markToStencil", offsetof(RenderPathCommand, markToStencil_));
@@ -405,14 +433,6 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureCoordinate", "COORD_U", COORD_U);
     engine->RegisterEnumValue("TextureCoordinate", "COORD_V", COORD_V);
     engine->RegisterEnumValue("TextureCoordinate", "COORD_W", COORD_W);
-    
-    engine->RegisterEnum("CubeMapFace");
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_X", FACE_POSITIVE_X);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_X", FACE_NEGATIVE_X);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Y", FACE_POSITIVE_Y);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Y", FACE_NEGATIVE_Y);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Z", FACE_POSITIVE_Z);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Z", FACE_NEGATIVE_Z);
     
     engine->RegisterEnum("RenderSurfaceUpdateMode");
     engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_MANUALUPDATE", SURFACE_MANUALUPDATE);
@@ -724,17 +744,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(ConstructBiasParametersInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
     engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
-    
-    engine->RegisterEnum("BlendMode");
-    engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ADD", BLEND_ADD);
-    engine->RegisterEnumValue("BlendMode", "BLEND_MULTIPLY", BLEND_MULTIPLY);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ALPHA", BLEND_ALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ADDALPHA", BLEND_ADDALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_PREMULALPHA", BLEND_PREMULALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_INVDESTALPHA", BLEND_INVDESTALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACT", BLEND_SUBTRACT);
-    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACTALPHA", BLEND_SUBTRACTALPHA);
     
     engine->RegisterEnum("CompareMode");
     engine->RegisterEnumValue("CompareMode", "CMP_ALWAYS", CMP_ALWAYS);

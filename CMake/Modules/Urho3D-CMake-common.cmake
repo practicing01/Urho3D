@@ -596,7 +596,7 @@ macro (enable_pch HEADER_PATHNAME)
                         # Precompiling header file
                         set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")     # Need a leading space for appending
                     else ()
-                        # Use the precompiled header file
+                        # Using precompiled header file
                         get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
                         if (NOT NO_PCH)
                             set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
@@ -620,10 +620,19 @@ macro (enable_pch HEADER_PATHNAME)
                 list (APPEND SOURCE_FILES ${CXX_FILENAME})
             endif ()
         endif ()
+    elseif (XCODE)
+        if (TARGET ${TARGET_NAME})
+            # Precompiling and using precompiled header file
+            set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER YES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
+            unset (${TARGET_NAME}_HEADER_PATHNAME)
+        else ()
+            # The target has not been created yet, so set an internal variable to come back here again later
+            set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
+        endif ()
     else ()
         # GCC or Clang
         if (TARGET ${TARGET_NAME})
-            # Cache the compiler flags setup for the current scope so far
+            # Precompiling header file
             get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
             get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
             get_target_property (TYPE ${TARGET_NAME} TYPE)
@@ -663,15 +672,12 @@ macro (enable_pch HEADER_PATHNAME)
                     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp ${DEPS}
                     COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
             endforeach ()
-            # Use the precompiled header file
+            # Using precompiled header file
             if ($ENV{COVERITY_SCAN_BRANCH})
                 # Coverity scan does not support PCH so workaround by including the actual header file
                 set (ABS_PATH_PCH ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
             else ()
-                if (NOT XCODE)
-                    set (PCH_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
-                endif ()
-                set (ABS_PATH_PCH ${PCH_DIR}${HEADER_FILENAME})
+                set (ABS_PATH_PCH ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME})
             endif ()
             foreach (FILE ${SOURCE_FILES})
                 if (FILE MATCHES \\.cpp$)
@@ -1091,7 +1097,7 @@ macro (setup_main_executable)
                 else ()
                     set (OUTPUT_COMMAND true)   # Nothing to output
                 endif ()
-                list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && \(\( `find ${DIR} -newer ${DIR} |wc -l` \)\) && touch -cm ${DIR} ${PACKAGING_COMMAND} || ${OUTPUT_COMMAND})
+                list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && bash -c \"\(\( `find ${DIR} -newer ${DIR} |wc -l` \)\)\" && touch -cm ${DIR} ${PACKAGING_COMMAND} || ${OUTPUT_COMMAND})
             endif ()
         endforeach ()
         string (MD5 MD5ALL ${MD5ALL})
@@ -1117,7 +1123,7 @@ macro (setup_main_executable)
             get_filename_component (NAME ${FILE} NAME)
             list (APPEND PAK_NAMES ${NAME})
         endforeach ()
-        if (CMAKE_BUILD_TYPE STREQUAL Debug AND NOT EMCC_VERSION VERSION_LESS 1.31.4)
+        if (CMAKE_BUILD_TYPE STREQUAL Debug AND EMCC_VERSION VERSION_GREATER 1.32.2)
             set (SEPARATE_METADATA --separate-metadata)
         endif ()
         add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}.data
@@ -1149,9 +1155,10 @@ macro (setup_test)
                 # The latency on Travis CI server could be very high at time, so add some adjustment
                 # If it is not enough causing a test case failure then so be it because it is better that than wait for it and still ends up in build error due to time limit
                 set (EMRUN_TIMEOUT_ADJUSTMENT + 8 * \\${URHO3D_TEST_TIMEOUT})
+                set (EMRUN_TIMEOUT_RETURNCODE --timeout_returncode 0)
             endif ()
             math (EXPR EMRUN_TIMEOUT "2 * ${URHO3D_TEST_TIMEOUT} ${EMRUN_TIMEOUT_ADJUSTMENT}")
-            add_test (NAME ${ARG_NAME} COMMAND ${EMRUN} --browser ${EMSCRIPTEN_EMRUN_BROWSER} --timeout ${EMRUN_TIMEOUT} --timeout_returncode 1 --kill_exit ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_NAME}.html ${ARG_OPTIONS})
+            add_test (NAME ${ARG_NAME} COMMAND ${EMRUN} --browser ${EMSCRIPTEN_EMRUN_BROWSER} --timeout ${EMRUN_TIMEOUT} ${EMRUN_TIMEOUT_RETURNCODE} --kill_exit ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_NAME}.html ${ARG_OPTIONS})
         else ()
             add_test (NAME ${ARG_NAME} COMMAND ${TARGET_NAME} ${ARG_OPTIONS})
         endif ()
@@ -1463,8 +1470,13 @@ elseif (EMSCRIPTEN)
     endif ()
 elseif (NOT CMAKE_CROSSCOMPILING AND NOT CMAKE_HOST_WIN32 AND "$ENV{USE_CCACHE}")
     # Warn user if PATH environment variable has not been correctly set for using ccache
-    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (EXIT_CODE EQUAL 0 AND NOT ${CMAKE_C_COMPILER} MATCHES ${CCACHE_SYMLINK})
+    if (APPLE)
+        set (WHEREIS brew info ccache)
+    else ()
+        set (WHEREIS whereis -b ccache)
+    endif ()
+    execute_process (COMMAND ${WHEREIS} COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0 AND NOT $ENV{PATH} MATCHES "${CCACHE_SYMLINK}")  # Need to stringify because CCACHE_SYMLINK variable could be empty when the command failed
         message (WARNING "The lib directory containing the ccache symlinks (${CCACHE_SYMLINK}) has not been added in the PATH environment variable. "
             "This is required to enable ccache support for native compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
             "In order to rectify this, the build tree must be regenerated after the PATH environment variable has been adjusted accordingly.")

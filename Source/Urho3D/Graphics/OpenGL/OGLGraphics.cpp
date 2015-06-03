@@ -70,10 +70,11 @@
 #endif
 
 #ifdef WIN32
-// On Intel / NVIDIA setups prefer the NVIDIA GPU
+// Prefer the high-performance GPU on switchable GPU systems
 #include <windows.h>
 extern "C" {
-    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+    __declspec(dllexport) DWORD NvOptimusEnablement = 1;
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 #endif
 
@@ -476,7 +477,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 }
                 else
                 {
-                    LOGERROR("Could not open window");
+                    LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
                     return false;
                 }
             }
@@ -2417,7 +2418,7 @@ void Graphics::Restore()
         
         if (!impl_->context_)
         {
-            LOGERROR("Could not create OpenGL context");
+            LOGERRORF("Could not create OpenGL context, root cause '%s'", SDL_GetError());
             return;
         }
 
@@ -2429,7 +2430,7 @@ void Graphics::Restore()
         GLenum err = glewInit();
         if (GLEW_OK != err)
         {
-            LOGERROR("Could not initialize OpenGL extensions");
+            LOGERRORF("Could not initialize OpenGL extensions, root cause: '%s'", glewGetErrorString(err));
             return;
         }
 
@@ -2617,7 +2618,7 @@ unsigned Graphics::GetRGFloat32Format()
 unsigned Graphics::GetFloat16Format()
 {
     #ifndef GL_ES_VERSION_2_0
-    return GL_LUMINANCE16F_ARB;
+    return GL_R16F;
     #else
     return GL_LUMINANCE;
     #endif
@@ -2626,7 +2627,7 @@ unsigned Graphics::GetFloat16Format()
 unsigned Graphics::GetFloat32Format()
 {
     #ifndef GL_ES_VERSION_2_0
-    return GL_LUMINANCE32F_ARB;
+    return GL_R32F;
     #else
     return GL_LUMINANCE;
     #endif

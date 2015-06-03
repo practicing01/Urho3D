@@ -102,6 +102,8 @@ public:
     unsigned GetDataSize(int width, int height, int depth) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
+    /// Return number of image components required to receive pixel data from GetData(), or 0 for compressed images.
+    unsigned GetComponents() const;
     /// Return whether the parameters are dirty.
     bool GetParametersDirty() const { return parametersDirty_ || !sampler_; }
 
@@ -118,10 +120,6 @@ public:
     /// Return sampler state object.
     void* GetSampler() const { return sampler_; }
     
-    /// Convert RGB data to RGBA for loading into a texture.
-    static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, const unsigned char* data);
-    /// Convert RGB data to RGBA for loading into a 3D texture.
-    static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, int depth, const unsigned char* data);
     /// Check maximum allowed mip levels for a specific texture size.
     static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
     /// Check maximum allowed mip levels for a specific 3D texture size.

@@ -51,6 +51,8 @@ static const char* sortModeNames[] =
     0
 };
 
+extern const char* blendModeNames[];
+
 TextureUnit ParseTextureUnitName(String name);
 
 void RenderTargetInfo::Load(const XMLElement& element)
@@ -59,6 +61,8 @@ void RenderTargetInfo::Load(const XMLElement& element)
     tag_ = element.GetAttribute("tag");
     if (element.HasAttribute("enabled"))
         enabled_ = element.GetBool("enabled");
+    if (element.HasAttribute("cubemap"))
+        cubemap_ = element.GetBool("cubemap");
     
     String formatName = element.GetAttribute("format");
     format_ = Graphics::GetFormat(formatName);
@@ -154,6 +158,12 @@ void RenderPathCommand::Load(const XMLElement& element)
         
         if (type_ == CMD_QUAD)
         {
+            if (element.HasAttribute("blend"))
+            {
+                String blend = element.GetAttributeLower("blend");
+                blendMode_ = ((BlendMode)GetStringListIndex(blend.CString(), blendModeNames, BLEND_REPLACE));
+            }
+
             XMLElement parameterElem = element.GetChild("parameter");
             while (parameterElem)
             {
@@ -169,9 +179,12 @@ void RenderPathCommand::Load(const XMLElement& element)
     }
     
     // By default use 1 output, which is the viewport
-    outputNames_.Push("viewport");
+    outputs_.Resize(1);
+    outputs_[0] = MakePair(String("viewport"), FACE_POSITIVE_X);
     if (element.HasAttribute("output"))
-        outputNames_[0] = element.GetAttribute("output");
+        outputs_[0].first_ = element.GetAttribute("output");
+    if (element.HasAttribute("face"))
+        outputs_[0].second_ = (CubeMapFace)element.GetInt("face");
     if (element.HasAttribute("depthstencil"))
         depthStencilName_ = element.GetAttribute("depthstencil");
     // Check for defining multiple outputs
@@ -181,9 +194,10 @@ void RenderPathCommand::Load(const XMLElement& element)
         unsigned index = outputElem.GetInt("index");
         if (index < MAX_RENDERTARGETS)
         {
-            if (index >= outputNames_.Size())
-                outputNames_.Resize(index + 1);
-            outputNames_[index] = outputElem.GetAttribute("name");
+            if (index >= outputs_.Size())
+                outputs_.Resize(index + 1);
+            outputs_[index].first_ = outputElem.GetAttribute("name");
+            outputs_[index].second_ = outputElem.HasAttribute("face") ? (CubeMapFace)outputElem.GetInt("face") : FACE_POSITIVE_X;
         }
         outputElem = outputElem.GetNext("output");
     }
@@ -223,16 +237,33 @@ void RenderPathCommand::RemoveShaderParameter(const String& name)
 void RenderPathCommand::SetNumOutputs(unsigned num)
 {
     num = Clamp((int)num, 1, MAX_RENDERTARGETS);
-    outputNames_.Resize(num);
+    outputs_.Resize(num);
+}
+
+void RenderPathCommand::SetOutput(unsigned index, const String& name, CubeMapFace face)
+{
+    if (index < outputs_.Size())
+        outputs_[index] = MakePair(name, face);
+    else if (index == outputs_.Size() && index < MAX_RENDERTARGETS)
+        outputs_.Push(MakePair(name, face));
 }
 
 void RenderPathCommand::SetOutputName(unsigned index, const String& name)
 {
-    if (index < outputNames_.Size())
-        outputNames_[index] = name;
-    else if (index == outputNames_.Size() && index < MAX_RENDERTARGETS)
-        outputNames_.Push(name);
+    if (index < outputs_.Size())
+        outputs_[index].first_ = name;
+    else if (index == outputs_.Size() && index < MAX_RENDERTARGETS)
+        outputs_.Push(MakePair(name, FACE_POSITIVE_X));
 }
+
+void RenderPathCommand::SetOutputFace(unsigned index, CubeMapFace face)
+{
+    if (index < outputs_.Size())
+        outputs_[index].second_ = face;
+    else if (index == outputs_.Size() && index < MAX_RENDERTARGETS)
+        outputs_.Push(MakePair(String::EMPTY, face));
+}
+
 
 void RenderPathCommand::SetDepthStencilName(const String& name)
 {
@@ -252,7 +283,12 @@ const Variant& RenderPathCommand::GetShaderParameter(const String& name) const
 
 const String& RenderPathCommand::GetOutputName(unsigned index) const
 {
-    return index < outputNames_.Size() ? outputNames_[index] : String::EMPTY;
+    return index < outputs_.Size() ? outputs_[index].first_ : String::EMPTY;
+}
+
+CubeMapFace RenderPathCommand::GetOutputFace(unsigned index) const
+{
+    return index < outputs_.Size() ? outputs_[index].second_ : FACE_POSITIVE_X;
 }
 
 RenderPath::RenderPath()

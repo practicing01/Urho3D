@@ -107,6 +107,7 @@ namespace Urho3D
 <a href="#Class_Menu"><b>Menu</b></a>
 <a href="#Class_MessageBox"><b>MessageBox</b></a>
 <a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_NavArea"><b>NavArea</b></a>
 <a href="#Class_Navigable"><b>Navigable</b></a>
 <a href="#Class_NavigationGeometryInfo"><b>NavigationGeometryInfo</b></a>
 <a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
@@ -141,6 +142,7 @@ namespace Urho3D
 <a href="#Class_RenderPath"><b>RenderPath</b></a>
 <a href="#Class_RenderPathCommand"><b>RenderPathCommand</b></a>
 <a href="#Class_RenderSurface"><b>RenderSurface</b></a>
+<a href="#Class_RenderTargetInfo"><b>RenderTargetInfo</b></a>
 <a href="#Class_Renderer"><b>Renderer</b></a>
 <a href="#Class_Resource"><b>Resource</b></a>
 <a href="#Class_ResourceCache"><b>ResourceCache</b></a>
@@ -1102,6 +1104,7 @@ Methods:
 
 - void SetEnabled(bool enable)
 - void Remove()
+- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - unsigned GetID() const
 - Node* GetNode() const
 - Scene* GetScene() const
@@ -1109,6 +1112,14 @@ Methods:
 - bool IsEnabledEffective() const
 - Component* GetComponent(StringHash type) const
 - Component* GetComponent(const String type) const
+
+Properties:
+
+- unsigned ID (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
+- Node* node (readonly)
+- Scene* scene (readonly)
 
 <a name="Class_Connection"></a>
 ### Connection : Object
@@ -1577,24 +1588,29 @@ Properties:
 Methods:
 
 - void SetNavigationFilterType(unsigned filterID)
-- bool SetMoveTarget(const Vector3& position)
-- bool SetMoveVelocity(const Vector3& velocity)
+- void SetMoveTarget(const Vector3& position)
+- void SetMoveVelocity(const Vector3& velocity)
 - void SetUpdateNodePosition(bool unodepos)
 - void SetMaxAccel(float val)
 - void SetMaxSpeed(float val)
 - void SetNavigationQuality(NavigationQuality val)
 - void SetNavigationPushiness(NavigationPushiness val)
+- void SetRadius(float radius)
+- void SetHeight(float height)
 - unsigned GetNavigationFilterType() const
 - Vector3 GetDesiredVelocity() const
 - Vector3 GetActualVelocity() const
 - const Vector3& GetTargetPosition() const
 - CrowdAgentState GetAgentState() const
 - CrowdTargetState GetTargetState() const
-- bool GetUpdateNodePosition()
-- float GetMaxSpeed()
-- float GetMaxAccel()
+- bool GetUpdateNodePosition() const
+- float GetMaxSpeed() const
+- float GetMaxAccel() const
 - NavigationQuality GetNavigationQuality() const
 - NavigationPushiness GetNavigationPushiness() const
+- bool HasArrived() const
+- float GetRadius() const
+- float GetHeight() const
 - Vector3 GetPosition() const
 - void DrawDebugGeometry(bool depthTest)
 
@@ -1605,6 +1621,15 @@ Properties:
 - NavigationPushiness navigationPushiness
 - float maxSpeed
 - float maxAccel
+- float radius
+- float height
+- unsigned navigationFilterType
+- Vector3 desiredVelocity (readonly)
+- Vector3 actualVelocity (readonly)
+- Vector3 targetPosition (readonly)
+- Vector3 position (readonly)
+- CrowdAgentState agentState (readonly)
+- CrowdTargetState targetState (readonly)
 
 <a name="Class_Cursor"></a>
 ### Cursor : BorderImage
@@ -1826,18 +1851,24 @@ Properties:
 Methods:
 
 - bool CreateCrowd()
+- void DrawDebugGeometry(bool depthTest)
 - void SetNavigationMesh(NavigationMesh* navMesh)
+- void SetAreaCost(unsigned filterID, unsigned areaID, float cost)
 - void SetMaxAgents(unsigned agentCt)
-- void SetAreaTypeCost(unsigned filterID, unsigned areaType, float cost)
-- NavigationMesh* GetNavigationMesh()
+- void SetCrowdTarget(const Vector3& position, int startId = 0, int endId = M_MAX_INT)
+- void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT)
+- void SetCrowdVelocity(const Vector3& velocity, int startId = 0, int endId = M_MAX_INT)
+- NavigationMesh* GetNavigationMesh() const
 - unsigned GetMaxAgents() const
-- float GetAreaTypeCost(unsigned filterID, unsigned areaType) const
+- float GetAreaCost(unsigned filterID, unsigned areaID) const
 - unsigned GetAgentCount() const
+- const PODVector<CrowdAgent*>& GetActiveAgents() const
 
 Properties:
 
 - NavigationMesh* navigationMesh
 - int maxAgents
+- unsigned agentCount (readonly)
 
 <a name="Class_Drawable"></a>
 ### Drawable : Component
@@ -1945,6 +1976,18 @@ Properties:
 
 <a name="Class_DynamicNavigationMesh"></a>
 ### DynamicNavigationMesh : NavigationMesh
+
+Methods:
+
+- void SetDrawObstacles(bool enable)
+- void SetMaxObstacles(unsigned maxObstacles)
+- bool GetDrawObstacles() const
+- unsigned GetMaxObstacles() const
+
+Properties:
+
+- bool drawObstacles
+- int maxObstacles
 
 <a name="Class_Engine"></a>
 ### Engine : Object
@@ -3273,6 +3316,23 @@ Properties:
 - unsigned numGeometries
 - unsigned numMorphs (readonly)
 
+<a name="Class_NavArea"></a>
+### NavArea : Component
+
+Methods:
+
+- unsigned GetAreaID() const
+- void SetAreaID(unsigned tolua_var_3)
+- BoundingBox GetBoundingBox()
+- void SetBoundingBox(const BoundingBox& bnds)
+- BoundingBox GetWorldBoundingBox() const
+
+Properties:
+
+- unsigned areaID
+- BoundingBox boundingBox
+- BoundingBox worldBoundingBox (readonly)
+
 <a name="Class_Navigable"></a>
 ### Navigable : Component
 
@@ -3315,8 +3375,12 @@ Methods:
 - void SetDetailSampleDistance(float distance)
 - void SetDetailSampleMaxError(float error)
 - void SetPadding(const Vector3& padding)
+- void SetAreaCost(unsigned areaID, float cost)
 - bool Build()
 - bool Build(const BoundingBox& boundingBox)
+- void SetPartitionType(NavmeshPartitionType aType)
+- void SetDrawOffMeshConnections(bool enable)
+- void SetDrawNavAreas(bool enable)
 - Vector3 FindNearestPoint(const Vector3& point)
 - Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents)
 - Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end)
@@ -3345,10 +3409,14 @@ Methods:
 - float GetDetailSampleDistance() const
 - float GetDetailSampleMaxError() const
 - const Vector3& GetPadding() const
+- float GetAreaCost(unsigned areaID) const
 - bool IsInitialized() const
 - const BoundingBox& GetBoundingBox() const
 - BoundingBox GetWorldBoundingBox() const
 - IntVector2 GetNumTiles() const
+- NavmeshPartitionType GetPartitionType()
+- bool GetDrawOffMeshConnections() const
+- bool GetDrawNavAreas() const
 
 Properties:
 
@@ -3366,6 +3434,9 @@ Properties:
 - float detailSampleDistance
 - float detailSampleMaxError
 - Vector3& padding
+- NavmeshPartitionType partitionType
+- bool drawOffMeshConnections
+- bool drawNavAreas
 - bool initialized (readonly)
 - BoundingBox& boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
@@ -3578,9 +3649,9 @@ Methods:
 - const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
 - Component* GetComponent(const String type) const
-- void SetID(unsigned id)
-- void SetScene(Scene* scene)
-- void ResetScene()
+- const PODVector<Component*>& GetComponents(const String type, bool recursive = false)
+- const PODVector<Node*>& GetChildren(bool recursive = false)
+- const PODVector<Node*>& GetChildrenWithComponent(const String type, bool recursive = false)
 - bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - Node* CreateChild(unsigned id, CreateMode mode)
@@ -3588,11 +3659,11 @@ Methods:
 
 Properties:
 
-- unsigned ID
+- unsigned ID (readonly)
 - String name
 - StringHash nameHash (readonly)
 - Node* parent
-- Scene* scene
+- Scene* scene (readonly)
 - bool enabled
 - bool enabledSelf (readonly)
 - Connection* owner
@@ -3715,15 +3786,21 @@ Methods:
 - void SetEndPoint(Node* node)
 - void SetRadius(float radius)
 - void SetBidirectional(bool enabled)
+- void SetMask(unsigned newMask)
+- void SetAreaID(unsigned newAreaID)
 - Node* GetEndPoint() const
 - float GetRadius() const
 - bool IsBidirectional() const
+- unsigned GetMask() const
+- unsigned GetAreaID() const
 
 Properties:
 
 - Node* endPoint
 - float radius
 - bool bidirectional
+- unsigned mask
+- unsigned areaID
 
 <a name="Class_PackageEntry"></a>
 ### PackageEntry
@@ -4367,12 +4444,15 @@ Methods:
 - void SetShaderParameter(const String name, const Variant& value)
 - void RemoveShaderParameter(const String name)
 - void SetNumOutputs(unsigned num)
+- void SetOutput(unsigned index, const String name, CubeMapFace face)
 - void SetOutputName(unsigned index, const String name)
+- void SetOutputFace(unsigned index, CubeMapFace face)
 - void SetDepthStencilName(const String name)
 - const String GetTextureName(TextureUnit unit) const
 - const Variant& GetShaderParameter(const String name) const
 - unsigned GetNumOutputs() const
 - const String GetOutputName(unsigned index) const
+- CubeMapFace GetOutputFace(unsigned index) const
 - const String GetDepthStencilName() const
 
 Properties:
@@ -4390,6 +4470,7 @@ Properties:
 - Color clearColor
 - float clearDepth
 - unsigned clearStencil
+- BlendMode blendMode
 - bool enabled
 - bool useFogColor
 - bool markToStencil
@@ -4432,6 +4513,29 @@ Properties:
 - RenderSurfaceUpdateMode updateMode
 - RenderSurface* linkedRenderTarget
 - RenderSurface* linkedDepthStencil
+
+<a name="Class_RenderTargetInfo"></a>
+### RenderTargetInfo
+
+
+Methods:
+
+- RenderTargetInfo() (GC)
+- RenderTargetInfo* new()
+- void Load(const XMLElement& element)
+
+Properties:
+
+- String name
+- String tag
+- unsigned format
+- Vector2 size
+- RenderTargetSizeMode sizeMode
+- bool enabled
+- bool cubemap
+- bool filtered
+- bool sRGB
+- bool persistent
 
 <a name="Class_Renderer"></a>
 ### Renderer
@@ -4566,6 +4670,7 @@ Methods:
 - void SetFinishBackgroundResourcesMs(int ms)
 - File* GetFile(const String name)
 - Resource* GetResource(const String type, const String name, bool sendEventOnFailure = true)
+- Resource* GetExistingResource(const String type, const String name)
 - bool BackgroundLoadResource(const String type, const String name, bool sendEventOnFailure = true)
 - unsigned GetNumBackgroundLoadResources() const
 - const Vector<String>& GetResourceDirs() const
@@ -5730,6 +5835,7 @@ Methods:
 - TextureUsage GetUsage() const
 - unsigned GetDataSize(int width, int height) const
 - unsigned GetRowDataSize(int width) const
+- unsigned GetComponents() const
 
 Properties:
 
@@ -5738,6 +5844,7 @@ Properties:
 - unsigned levels (readonly)
 - int width (readonly)
 - int height (readonly)
+- unsigned components (readonly)
 - TextureFilterMode filterMode
 - Color& borderColor
 - bool sRGB
@@ -5803,7 +5910,6 @@ Properties:
 
 Methods:
 
-- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - void SetTmxFile(TmxFile2D* tmxFile)
 - TmxFile2D* GetTmxFile() const
 - const TileMapInfo2D& GetInfo() const
@@ -5842,7 +5948,6 @@ Properties:
 
 Methods:
 
-- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - void SetDrawOrder(int drawOrder)
 - void SetVisible(bool visible)
 - int GetDrawOrder() const
@@ -7045,10 +7150,9 @@ Properties:
 - int CROWD_AGENT_TARGET_FAILED
 - int CROWD_AGENT_TARGET_VALID
 - int CROWD_AGENT_TARGET_REQUESTING
-- int CROWD_AGENT_TARGET_WAITINGFORPATH
 - int CROWD_AGENT_TARGET_WAITINGFORQUEUE
+- int CROWD_AGENT_TARGET_WAITINGFORPATH
 - int CROWD_AGENT_TARGET_VELOCITY
-- int CROWD_AGENT_TARGET_ARRIVED
 
 ### CubeMapFace
 
@@ -7235,6 +7339,11 @@ Properties:
 - int NAVIGATIONQUALITY_MEDIUM
 - int NAVIGATIONQUALITY_HIGH
 
+### NavmeshPartitionType
+
+- int NAVMESH_PARTITION_WATERSHED
+- int NAVMESH_PARTITION_MONOTONE
+
 ### Orientation
 
 - int O_HORIZONTAL
@@ -7267,6 +7376,11 @@ Properties:
 - int RAY_OBB
 - int RAY_TRIANGLE
 
+### RenderCommandSortMode
+
+- int SORT_FRONTTOBACK
+- int SORT_BACKTOFRONT
+
 ### RenderCommandType
 
 - int CMD_NONE
@@ -7282,6 +7396,12 @@ Properties:
 - int SURFACE_MANUALUPDATE
 - int SURFACE_UPDATEVISIBLE
 - int SURFACE_UPDATEALWAYS
+
+### RenderTargetSizeMode
+
+- int SIZE_ABSOLUTE
+- int SIZE_VIEWPORTDIVISOR
+- int SIZE_VIEWPORTMULTIPLIER
 
 ### ShaderType
 

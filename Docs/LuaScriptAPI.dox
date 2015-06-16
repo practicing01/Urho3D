@@ -378,6 +378,7 @@ Methods:
 - bool IsPlaying(const String name) const
 - bool IsFadingIn(const String name) const
 - bool IsFadingOut(const String name) const
+- bool IsAtEnd(const String name) const
 - char GetLayer(const String name) const
 - Bone* GetStartBone(const String name) const
 - const String GetStartBoneName(const String name) const
@@ -4344,6 +4345,7 @@ Properties:
 
 - Vector3 position
 - Vector3 normal
+- Vector2 textureUV
 - float distance
 - Drawable* drawable
 - Node* node
@@ -7375,6 +7377,7 @@ Properties:
 - int RAY_AABB
 - int RAY_OBB
 - int RAY_TRIANGLE
+- int RAY_TRIANGLE_UV
 
 ### RenderCommandSortMode
 

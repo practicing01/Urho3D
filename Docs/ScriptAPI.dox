@@ -2650,6 +2650,7 @@ Methods:
 - float GetSpeed(const String&) const
 - float GetTime(const String&) const
 - float GetWeight(const String&) const
+- bool IsAtEnd(const String&) const
 - bool IsFadingIn(const String&) const
 - bool IsFadingOut(const String&) const
 - bool IsPlaying(const String&) const
@@ -8854,6 +8855,7 @@ Properties:
 - Vector3 normal
 - Vector3 position
 - uint subObject
+- Vector2 textureUV
 
 <a name="Class_Rect"></a>
 
@@ -9557,6 +9559,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasMethod(const String&) const
+- bool IsA(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -13517,6 +13520,7 @@ Properties:
 - RAY_AABB
 - RAY_OBB
 - RAY_TRIANGLE
+- RAY_TRIANGLE_UV
 
 
 ### RenderCommandSortMode

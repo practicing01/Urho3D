@@ -87,6 +87,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_EXTRAS        |0|Build extras (native and RPI only)|
 |URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
 |URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
+|URHO3D_PCH           |1|Enable PCH support|
 |URHO3D_SSE           |1|Enable SSE instruction set|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
@@ -712,13 +713,14 @@ All the \ref Running_Commandline "command line options" supported by Urho3D play
 
 Hint: to get more content to look at, run the Physics sample application (bin/Data/Scripts/11_Physics.as), and press F5. This saves a scene file called Physics.xml into the Data/Scenes subdirectory, which can be loaded in the editor. Scenes utilized by the NinjaSnowWar and SceneAndUILoad examples also exist in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
 
-\section EditorInstructions_Controls Controls
+\section EditorInstructions_Controls Controls (standard style hotkeys)
 
 \verbatim
 Left mouse         - Select nodes or drag the node transform gizmo. Hold Shift to
                      select components instead. Hold Ctrl to multiselect.
 Right mouse        - Hold down and move mouse to rotate camera
 Middle mouse       - Hold down orbits the camera around selected objects
+Shift+Right mouse   - Hold down pans the camera
 Shift+Middle mouse - Hold down pans the camera
 
 WSAD or arrows     - Move
@@ -727,6 +729,7 @@ E                  - Ascend
 Q                  - Descend
 Shift+E,Q          - Ascend or descend faster
 
+Home               - Center view on currently selected object
 Numpad5            - Toggle orthographic / perspective camera
 Numpad1            - Front view
 Numpad3            - Right hand view
@@ -770,7 +773,35 @@ F11                - Captures a screenshot
 F12                - Toggle UI
 \endverbatim
 
+\section EditorInstructions_Controls2 Controls (blender style hotkeys)
+
+Hotkeys list show only differences with standard style
+
+\verbatim
+Shift+F            - Enter/Exit camera's flying mode
+G,R,S              - Object manipulation mode: move/rotate/scale ( note: camera flying mode must be off to do this manipulation)
+Cycle press G,R,S  - Toggle between world and local axes manipulation
+Shift+D            - Duplicate node or component
+H                  - Enable/disable node hierarchy or component
+Alt+H              - Enable all nodes hierarchy or component in scene
+Alt+P              - Unparent scene node
+Ctrl+P             - Parent all selected scene nodes to last selected node 
+Z                  - Cycle through solid, wireframe and point rendering
+M                  - Show/Hide LayerEditor
+F                  - Focus on selected object (LookAt)               
+X                  - Delete node or component
+\endverbatim
+
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.
+
+An option in the settings (Pan using MMB) changes the default behavior of the MMB and RMB to pan the camera, and to require using Shift to use camera orbit and rotation.
+
+\verbatim
+Right mouse        - Hold down pans the camera
+Middle mouse       - Hold down pans the camera
+Shift+Right mouse  - Hold down and move mouse to rotate camera
+Shift+Middle mouse - Hold down orbits the camera around selected objects
+\endverbatim
 
 \section EditorInstructions_Workflow Workflow
 

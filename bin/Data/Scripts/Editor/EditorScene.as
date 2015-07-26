@@ -18,6 +18,7 @@ CreateMode instantiateMode = REPLICATED;
 bool sceneModified = false;
 bool runUpdate = false;
 
+Node@ lastSelectedNode;
 Array<Node@> selectedNodes;
 Array<Component@> selectedComponents;
 Node@ editNode;
@@ -293,8 +294,7 @@ Node@ CreateNode(CreateMode mode)
         newNode = editNode.CreateChild("", mode);
     else
         newNode = editorScene.CreateChild("", mode);
-    // Set the new node a certain distance from the camera
-    newNode.position = GetNewNodePosition();
+    newNode.worldPosition = GetNewNodePosition();
 
     // Create an undo action for the create
     CreateNodeAction action;
@@ -517,6 +517,11 @@ bool ToggleSceneUpdate()
     else
         StopSceneUpdate();
     return true;
+}
+
+bool ShowLayerMover()
+{
+  return ShowLayerEditor();
 }
 
 void SetSceneModified()
@@ -767,6 +772,54 @@ bool SceneUnparent()
     return true;
 }
 
+bool NodesParentToLastSelected()
+{
+    if (lastSelectedNode is null)
+        return false;
+        
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
+        return false;
+
+    ui.cursor.shape = CS_BUSY;
+
+    // Group for storing undo actions
+    EditActionGroup group;
+
+    // Parent selected nodes to root
+    Array<Node@> changedNodes;
+    
+    // Find new parent node it selected last
+    Node@ lastNode = lastSelectedNode;
+    
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        
+        Node@ sourceNode = selectedNodes[i];
+        if ( sourceNode.id == lastNode.id)
+            continue; // Skip last node it is parent
+        
+        if (sourceNode.parent.id == lastNode.id)
+            continue; // Root or already parented to root
+
+        // Perform the reparenting, continue loop even if action fails
+        ReparentNodeAction action;
+        action.Define(sourceNode, lastNode);
+        group.actions.Push(action);
+
+        SceneChangeParent(sourceNode, lastNode, false);
+        changedNodes.Push(sourceNode);
+    }
+
+    // Reselect the changed nodes at their new position in the list
+    for (uint i = 0; i < changedNodes.length; ++i)
+        hierarchyList.AddSelection(GetListIndex(changedNodes[i]));
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+
+    return true;
+}
+
 bool SceneToggleEnable()
 {
     if (!CheckHierarchyWindowFocus())
@@ -803,6 +856,60 @@ bool SceneToggleEnable()
             // Create undo action
             EditAttributeAction action;
             action.Define(selectedComponents[i], 0, Variant(oldEnabled));
+            group.actions.Push(action);
+        }
+    }
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+
+    return true;
+}
+
+bool SceneEnableAllNodes()
+{
+    if (!CheckHierarchyWindowFocus())
+        return false;
+
+    ui.cursor.shape = CS_BUSY;
+
+    EditActionGroup group;
+
+    // Toggle enabled state of nodes recursively
+    Array<Node@> allNodes;
+    allNodes = editorScene.GetChildren(true);
+    
+    for (uint i = 0; i < allNodes.length; ++i)
+    {
+        // Do not attempt to disable the Scene
+        if (allNodes[i].typeName == "Node")
+        {
+            bool oldEnabled = allNodes[i].enabled;
+            if (oldEnabled == false)
+              allNodes[i].SetEnabledRecursive(true);
+
+            // Create undo action
+            ToggleNodeEnabledAction action;
+            action.Define(allNodes[i], oldEnabled);
+            group.actions.Push(action);
+        }
+    }
+    
+    Array<Component@> allComponents;
+    allComponents = editorScene.GetComponents();
+    
+    for (uint i = 0; i < allComponents.length; ++i)
+    {
+        // Some components purposefully do not expose the Enabled attribute, and it does not affect them in any way
+        // (Octree, PhysicsWorld). Check that the first attribute is in fact called "Is Enabled"
+        if (allComponents[i].numAttributes > 0 && allComponents[i].attributeInfos[0].name == "Is Enabled")
+        {
+            bool oldEnabled = allComponents[i].enabled;
+            allComponents[i].enabled = true;
+
+            // Create undo action
+            EditAttributeAction action;
+            action.Define(allComponents[i], 0, Variant(oldEnabled));
             group.actions.Push(action);
         }
     }
@@ -1037,10 +1144,50 @@ bool SceneAddChildrenStaticModelGroup()
         smg.AddInstanceNode(children[i]);
 
     EditAttributeAction action;
-    action.Define(smg, attrIndex, oldValue);;
+    action.Define(smg, attrIndex, oldValue);
     SaveEditAction(action);
     SetSceneModified();
     FocusComponent(smg);
+    
+    return true;
+}
+
+bool SceneSetChildrenSplinePath(bool makeCycle)
+{
+    SplinePath@ sp = cast<SplinePath>(editComponents.length > 0 ? editComponents[0] : null);
+    if (sp is null && editNode !is null)
+        sp = editNode.GetComponent("SplinePath");
+
+    if (sp is null)
+    {
+        MessageBox("Must have a SplinePath component selected.");
+        return false;
+    }
+
+    uint attrIndex = GetAttributeIndex(sp, "Control Points");
+    Variant oldValue = sp.attributes[attrIndex];
+
+    Array<Node@> children = sp.node.GetChildren(true);
+    if (children.length >= 2)
+    {
+        sp.ClearControlPoints();
+        for (uint i = 0; i < children.length; ++i)
+            sp.AddControlPoint(children[i]);
+    }
+    else
+    {
+        MessageBox("You must have a minimum two children Nodes in selected Node.");
+        return false;
+    }
+
+    if (makeCycle)
+        sp.AddControlPoint(children[0]);
+
+    EditAttributeAction action;
+    action.Define(sp, attrIndex, oldValue);
+    SaveEditAction(action);
+    SetSceneModified();
+    FocusComponent(sp);
     
     return true;
 }

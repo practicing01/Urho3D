@@ -30,6 +30,7 @@ Urho3D development, contributions and bugfixes by:
 - Gunnar Kriik
 - Ali Kämäräinen
 - Pete Leigh
+- Thorbjørn Lindeijer
 - Jonne Nauha
 - Paul Noome
 - David Palacios
@@ -72,6 +73,7 @@ Urho3D development, contributions and bugfixes by:
 - skaiware
 - szamq
 - thebluefish
+- yushli
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 (http://www.horde3d.org). Additional inspiration & research used:
@@ -109,6 +111,8 @@ Urho3D uses the following third-party libraries:
 - LuaJIT 2.0.3 (http://www.luajit.org)
 - LZ4 (http://code.google.com/p/lz4/)
 - MojoShader (http://icculus.org/mojoshader/)
+- Mustache 1.0 (http://mustache.github.io/, https://github.com/kainjow/Mustache)
+- nanodbc 2.2.2 (http://lexicalunit.github.io/nanodbc/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.5 (http://pugixml.org/)
 - rapidjson 0.11 (https://code.google.com/p/rapidjson/)
@@ -119,6 +123,7 @@ Urho3D uses the following third-party libraries:
 - stb_image 2.05 (http://nothings.org/)
 - stb_image_write 0.98 (http://nothings.org/)
 - stb_vorbis 1.05 (http://nothings.org/)
+- SQLite 3.8.10.2 (https://www.sqlite.org/)
 - tolua++ 1.0.93 (http://www.codenix.com/~tolua)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong

@@ -284,7 +284,7 @@ void Input::Update()
     {
 #ifdef REQUIRE_CLICK_TO_FOCUS
         // When using the "click to focus" mechanism, only focus automatically in fullscreen or non-hidden mouse mode
-        if (!inputFocus_ && (mouseVisible_ || graphics_->GetFullscreen() || screenModeChanged_) && (flags & SDL_WINDOW_INPUT_FOCUS))
+        if (!inputFocus_ && ((mouseVisible_ || mouseMode_ == MM_FREE) || graphics_->GetFullscreen() || screenModeChanged_) && (flags & SDL_WINDOW_INPUT_FOCUS))
 #else
         if (!inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS))
 #endif
@@ -361,7 +361,7 @@ void Input::Update()
     // Check for relative mode mouse move
     // Note that Emscripten will use SDL mouse move events for relative mode instead
 #ifndef EMSCRIPTEN
-    if (!touchEmulation_ && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
+    if (!touchEmulation_ && (graphics_->GetExternalWindow() || ((!mouseVisible_ && mouseMode_ != MM_FREE) && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
 #else
     if (!touchEmulation_ && mouseMode_ != MM_RELATIVE && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
 #endif
@@ -444,11 +444,14 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
             {
                 SDL_ShowCursor(SDL_FALSE);
 #ifndef EMSCRIPTEN
-                // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
-                lastVisibleMousePosition_ = GetMousePosition();
-                IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-                SetMousePosition(center);
-                lastMousePosition_ = center;
+                if (mouseMode_ != MM_FREE)
+                {
+                    // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
+                    lastVisibleMousePosition_ = GetMousePosition();
+                    IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+                    SetMousePosition(center);
+                    lastMousePosition_ = center;
+                }
 #else
                 lastVisibleMousePosition_ = GetMousePosition();
                 lastMousePosition_ = lastVisibleMousePosition_;
@@ -557,7 +560,7 @@ void Input::SetMouseMode(MouseMode mode)
 #endif
 
         // Handle changing to new mode
-        if (mode == MM_ABSOLUTE)
+        if (mode == MM_ABSOLUTE || mode == MM_FREE)
         {
 #ifndef EMSCRIPTEN
             SetMouseGrabbed(false);
@@ -768,44 +771,38 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             {
                 text->SetVisible(false);
                 String keyBinding = text->GetText();
+                int mappedKeyBinding[4] = {'W', 'S', 'A', 'D'};
+                Vector<String> keyBindings;
                 if (keyBinding.Contains(' '))   // e.g.: "UP DOWN LEFT RIGHT"
+                    keyBindings = keyBinding.Split(' ');    // Attempt to split the text using ' ' as separator
+                else if (keyBinding.Length() == 4)
                 {
-                    // Attempt to split the text using ' ' as separator
-                    Vector<String> keyBindings(keyBinding.Split(' '));
-                    String mappedKeyBinding;
-                    if (keyBindings.Size() == 4)
-                    {
-                        PopulateKeyBindingMap(keyBindingMap);
+                    keyBindings.Resize(4);      // e.g.: "WSAD"
+                    for (unsigned i = 0; i < 4; ++i)
+                        keyBindings[i] = keyBinding.Substring(i, 1);
+                }
+                if (keyBindings.Size() == 4)
+                {
+                    PopulateKeyBindingMap(keyBindingMap);
 
-                        for (unsigned j = 0; j < 4; ++j)
+                    for (unsigned j = 0; j < 4; ++j)
+                    {
+                        if (keyBindings[j].Length() == 1)
+                            mappedKeyBinding[j] = keyBindings[j][0];
+                        else
                         {
-                            if (keyBindings[j].Length() == 1)
-                                mappedKeyBinding.Append(keyBindings[j][0]);
+                            HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
+                            if (i != keyBindingMap.End())
+                                mappedKeyBinding[j] = i->second_;
                             else
-                            {
-                                HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
-                                if (i != keyBindingMap.End())
-                                    mappedKeyBinding.Append((char)i->second_);
-                                else
-                                    break;
-                            }
+                                LOGERRORF("%s - %s cannot be mapped, fallback to '%c'", name.CString(), keyBindings[j].CString(),
+                                    mappedKeyBinding[j]);
                         }
                     }
-                    if (mappedKeyBinding.Length() != 4)
-                    {
-                        LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
-                        keyBinding = "WSAD";
-                    }
-                    else
-                        keyBinding = mappedKeyBinding;
                 }
-                else if (keyBinding.Length() != 4)
-                {
+                else
                     LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
-                    keyBinding = "WSAD";
-                }
-
-                element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
+                element->SetVar(VAR_BUTTON_KEY_BINDING, IntRect(mappedKeyBinding));
             }
         }
 
@@ -1195,7 +1192,7 @@ void Input::ResetJoysticks()
     joysticks_.Clear();
 
     // Open each detected joystick automatically on startup
-    int size = SDL_NumJoysticks();
+    unsigned size = static_cast<unsigned>(SDL_NumJoysticks());
     for (unsigned i = 0; i < size; ++i)
         OpenJoystick(i);
 }
@@ -1571,9 +1568,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
         // Emscripten will use SDL mouse move events for relative mode, as repositioning the mouse and
         // measuring distance from window center is not supported
 #ifndef EMSCRIPTEN
-        if (mouseVisible_ && !touchEmulation_)
+        if ((mouseVisible_ || mouseMode_ == MM_FREE) && !touchEmulation_)
 #else
-        if ((mouseVisible_ || mouseMode_ == MM_RELATIVE) && !touchEmulation_)
+        if ((mouseVisible_ || mouseMode_ == MM_RELATIVE || mouseMode_ == MM_FREE) && !touchEmulation_)
 #endif
         {
             mouseMove_.x_ += evt.motion.xrel;
@@ -2003,7 +2000,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     windowID_ = SDL_GetWindowID(window);
 
     // If screen mode happens due to mouse drag resize, do not recenter the mouse as that would lead to erratic window sizes
-    if (!mouseVisible_ && !inResize_)
+    if (!mouseVisible_ && mouseMode_ != MM_FREE && !inResize_)
     {
         IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
         SetMousePosition(center);
@@ -2124,8 +2121,8 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         }
         else
         {
-            // Hat is binded by 4 keys, like 'WASD'
-            String keyBinding = keyBindingVar.GetString();
+            // Hat is binded by 4 integers representing keysyms for 'W', 'S', 'A', 'D' or something similar
+            IntRect keyBinding = keyBindingVar.GetIntRect();
 
             if (eventType == E_TOUCHEND)
             {
@@ -2141,13 +2138,13 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
                 evt.type = SDL_KEYDOWN;
                 IntVector2 relPosition = position - element->GetScreenPosition() - element->GetSize() / 2;
                 if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.key.keysym.sym = keyBinding[0];
+                    evt.key.keysym.sym = keyBinding.left_;      // The integers are encoded in WSAD order to l-t-r-b
                 else if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.key.keysym.sym = keyBinding[1];
+                    evt.key.keysym.sym = keyBinding.top_;
                 else if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-                    evt.key.keysym.sym = keyBinding[2];
+                    evt.key.keysym.sym = keyBinding.right_;
                 else if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-                    evt.key.keysym.sym = keyBinding[3];
+                    evt.key.keysym.sym = keyBinding.bottom_;
                 else
                     return;
 

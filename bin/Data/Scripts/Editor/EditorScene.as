@@ -2,6 +2,7 @@
 
 #include "Scripts/Editor/EditorHierarchyWindow.as"
 #include "Scripts/Editor/EditorInspectorWindow.as"
+#include "Scripts/Editor/EditorCubeCapture.as"
 
 const int PICK_GEOMETRIES = 0;
 const int PICK_LIGHTS = 1;
@@ -229,6 +230,7 @@ bool LoadScene(const String&in fileName)
     UpdateWindowTitle();
     DisableInspectorLock();
     UpdateHierarchyItem(editorScene, true);
+    CollapseHierarchy();
     ClearEditActions();
 
     suppressSceneChanges = false;
@@ -522,7 +524,10 @@ bool ToggleSceneUpdate()
 
 bool ShowLayerMover()
 {
-  return ShowLayerEditor();
+    if (ui.focusElement is null)
+        return ShowLayerEditor();
+    else
+        return false;
 }
 
 void SetSceneModified()
@@ -1202,6 +1207,50 @@ bool SceneRebuildNavigation()
     return success;
 }
 
+bool SceneRenderZoneCubemaps()
+{
+    bool success = false;
+    Array<Zone@> capturedThisCall;
+    bool alreadyCapturing = activeCubeCapture.length > 0; // May have managed to quickly queue up a second round of zones to render cubemaps for
+    
+    for (int i = 0; i < selectedNodes.length; ++i)
+    {
+        Array<Component@>@ zones = selectedNodes[i].GetComponents("Zone", true);
+        for (int z = 0; z < zones.length; ++z)
+        {
+            Zone@ zone = cast<Zone>(zones[z]);
+            if (zone !is null)
+            {
+                activeCubeCapture.Push(EditorCubeCapture(zone));
+                capturedThisCall.Push(zone);
+            }
+        }
+    }
+    
+    for (int i = 0; i < selectedComponents.length; ++i)
+    {
+        Zone@ zone = cast<Zone>(selectedComponents[i]);
+        if (zone !is null)
+        {
+            if (capturedThisCall.FindByRef(zone) < 0)
+            {
+                activeCubeCapture.Push(EditorCubeCapture(zone));
+                capturedThisCall.Push(zone);
+            }
+        }
+    }
+    
+    // Start rendering cubemaps if there are any to render and the queue isn't already running
+    if (activeCubeCapture.length > 0 && !alreadyCapturing)
+        activeCubeCapture[0].Start();
+
+    if (capturedThisCall.length <= 0)
+    {
+        MessageBox("No zones selected to render cubemaps for/");
+    }
+    return capturedThisCall.length > 0;
+}
+
 bool SceneAddChildrenStaticModelGroup()
 {
     StaticModelGroup@ smg = cast<StaticModelGroup>(editComponents.length > 0 ? editComponents[0] : null);
@@ -1371,3 +1420,104 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
     animatedModel.model = model;
     CreateLoadedComponent(animatedModel);
 }
+
+bool ColorWheelSetupBehaviorForColoring()
+{    
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+    
+    coloringPropertyName = menu.name;
+    
+    if (coloringPropertyName == "menuCancel") return false;
+    
+    if (coloringComponent.typeName == "Light") 
+    {
+        Light@ light = cast<Light>(coloringComponent);
+        if (light !is null) 
+        {          
+            if (coloringPropertyName == "menuLightColor")
+            {
+                coloringOldColor = light.color;
+                ShowColorWheelWithColor(coloringOldColor);
+            }
+            else if (coloringPropertyName == "menuSpecularIntensity")
+            {
+               // ColorWheel have only 0-1 range output of V-value(BW), and for huge-range values we devide in and multiply out 
+               float scaledSpecular = light.specularIntensity * 0.1f; 
+               coloringOldScalar = scaledSpecular;
+               ShowColorWheelWithColor(Color(scaledSpecular,scaledSpecular,scaledSpecular));
+
+            }
+            else if (coloringPropertyName == "menuBrightnessMultiplier")
+            { 
+               float scaledBrightness = light.brightness * 0.1f;
+               coloringOldScalar = scaledBrightness;
+               ShowColorWheelWithColor(Color(scaledBrightness,scaledBrightness,scaledBrightness));
+            }   
+        }      
+    }
+    else if (coloringComponent.typeName == "StaticModel") 
+    {
+        StaticModel@ model  = cast<StaticModel>(coloringComponent);
+        if (model !is null) 
+        {            
+            Material@ mat = model.materials[0];
+            if (mat !is null) 
+            { 
+                if (coloringPropertyName == "menuDiffuseColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat(),values[3].ToFloat()); //RGBA
+                    ShowColorWheelWithColor(coloringOldColor);
+                }
+                else if (coloringPropertyName == "menuSpecularColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat());
+                    coloringOldScalar = values[3].ToFloat();
+                    ShowColorWheelWithColor(Color(coloringOldColor.r, coloringOldColor.g, coloringOldColor.b, coloringOldScalar/128.0f)); //RGB + shine
+                }
+                else if (coloringPropertyName == "menuEmissiveColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); // RGB
+                    
+                    
+                    ShowColorWheelWithColor(coloringOldColor);
+                }
+                else if (coloringPropertyName == "menuEnvironmentMapColor")
+                {   
+                    Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); //RGB
+                    
+                    ShowColorWheelWithColor(coloringOldColor);
+                }      
+            }
+        }
+    }
+    else if (coloringComponent.typeName == "Zone") 
+    {
+        Zone@ zone  = cast<Zone>(coloringComponent);
+        if (zone !is null) 
+        {
+            if (coloringPropertyName == "menuAmbientColor")
+            {
+                coloringOldColor = zone.ambientColor;
+            }
+            else if (coloringPropertyName == "menuFogColor") 
+            {
+                coloringOldColor = zone.fogColor;
+            }
+            
+            ShowColorWheelWithColor(coloringOldColor);
+        }
+    }
+          
+    return true;
+}
+

@@ -69,6 +69,13 @@ if (URHO3D_NETWORK)
     add_subdirectory (ThirdParty/kNet)
 endif ()
 
+if (URHO3D_DATABASE_ODBC)
+    add_subdirectory (ThirdParty/nanodbc)
+endif ()
+if (URHO3D_DATABASE_SQLITE)
+    add_subdirectory (ThirdParty/SQLite)
+endif ()
+
 if (URHO3D_NAVIGATION)
     add_subdirectory (ThirdParty/Detour)
     add_subdirectory (ThirdParty/DetourCrowd)
@@ -78,6 +85,11 @@ endif ()
 
 if (URHO3D_URHO2D)
     add_subdirectory (ThirdParty/Box2D)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spine)
+        add_subdirectory (ThirdParty/spine)
+        # Add definition for Spine
+        add_definitions (-DURHO3D_SPINE)
+    endif ()
 endif ()
 
 if (URHO3D_PHYSICS)
@@ -95,6 +107,11 @@ endif ()
 
 # Urho3D game engine library
 add_subdirectory (Urho3D)
+
+# Urho3D Clang tools
+if (URHO3D_CLANG_TOOLS)
+    add_subdirectory (Clang-Tools)
+endif ()
 
 # Urho3D tools
 add_subdirectory (Tools)

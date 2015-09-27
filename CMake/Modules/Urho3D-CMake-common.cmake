@@ -43,6 +43,9 @@ endif ()
 
 # Define all supported build options
 include (CMakeDependentOption)
+option (URHO3D_C++11 "Enable C++11 standard")
+cmake_dependent_option (URHO3D_NOABI "If set then do not explicitly specify the ABI compiler flag for code generation (GCC and Clang only)" FALSE "NOT MSVC" FALSE)
+mark_as_advanced (URHO3D_C++11 URHO3D_NOABI)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
@@ -75,6 +78,7 @@ option (URHO3D_LUA "Enable additional Lua scripting support")
 cmake_dependent_option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)" FALSE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
 cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT EMSCRIPTEN" FALSE)
+cmake_dependent_option (URHO3D_DATABASE_ODBC "Enable Database support with ODBC, requires vendor-specific ODBC driver" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
 if (MINGW AND NOT DEFINED URHO3D_SSE)
@@ -93,20 +97,22 @@ cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
-
     if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_CONFIGURATION_TYPES)
         set (URHO3D_DEFAULT_LUA_RAW FALSE)
     else ()
         set (URHO3D_DEFAULT_LUA_RAW TRUE)
     endif ()
     cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
-
     option (URHO3D_SAMPLES "Build sample applications")
+    option (URHO3D_BINDINGS "Enable API binding generation support for script subystems")
+    cmake_dependent_option (URHO3D_CLANG_TOOLS "Build Clang tools (native only)" FALSE "NOT RPI AND NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
+    mark_as_advanced (URHO3D_CLANG_TOOLS URHO3D_BINDINGS)
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
     option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
     option (URHO3D_PCH "Enable PCH support" TRUE)
+    option (URHO3D_DATABASE_SQLITE "Enable Database support with SQLite embedded" FALSE)
     cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
     option (URHO3D_FILEWATCHER "Enable filewatcher support" TRUE)
     if (CPACK_SYSTEM_NAME STREQUAL Linux)
@@ -148,16 +154,21 @@ cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows p
 # On Windows platform Direct3D11 can be optionally chosen
 # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
 cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
-if (CMAKE_HOST_WIN32 AND NOT DEFINED URHO3D_MKLINK)
-    # Test whether the host system is capable of setting up symbolic link
-    execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-    if (MKLINK_EXIT_CODE EQUAL 0)
-        set (URHO3D_MKLINK TRUE)
-        file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
-    else ()
-        set (URHO3D_MKLINK FALSE)
+if (CMAKE_HOST_WIN32)
+    if (NOT DEFINED URHO3D_MKLINK)
+        # Test whether the host system is capable of setting up symbolic link
+        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+        if (MKLINK_EXIT_CODE EQUAL 0)
+            set (URHO3D_MKLINK TRUE)
+            file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
+        else ()
+            set (URHO3D_MKLINK FALSE)
+        endif ()
+        set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
     endif ()
-    set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
+    set (NULL_DEVICE nul)
+else ()
+    set (NULL_DEVICE /dev/null)
 endif ()
 cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
 cmake_dependent_option (URHO3D_WIN32_CONSOLE "Use console main() as entry point when setting up Windows executable targets (Windows platform only)" FALSE "WIN32" FALSE)
@@ -240,10 +251,37 @@ if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
     endif ()
 endif()
 
+# Clang tools building
+if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
+    # Ensure LLVM/Clang is installed
+    find_program (LLVM_CONFIG NAMES llvm-config llvm-config-64 llvm-config-32 HINTS $ENV{LLVM_CLANG_ROOT}/bin DOC "LLVM config tool" NO_CMAKE_FIND_ROOT_PATH)
+    if (NOT LLVM_CONFIG)
+        message (FATAL_ERROR "Could not find LLVM/Clang installation")
+    endif ()
+endif ()
+if (URHO3D_CLANG_TOOLS)
+    # Require C++11 standard and no precompiled-header
+    set (URHO3D_C++11 1)
+    set (URHO3D_PCH 0)
+    set (URHO3D_LIB_TYPE SHARED)
+    # Set build options that would maximise the AST of Urho3D library
+    foreach (OPT URHO3D_ANGELSCRIPT URHO3D_LUA URHO3D_FILEWATCHER URHO3D_PROFILING URHO3D_LOGGING URHO3D_NAVIGATION URHO3D_NETWORK URHO3D_PHYSICS URHO3D_URHO2D URHO3D_DATABASE_SQLITE)
+        set (${OPT} 1)
+    endforeach()
+    foreach (OPT URHO3D_TESTING URHO3D_LUAJIT URHO3D_DATABASE_ODBC)
+        set (${OPT} 0)
+    endforeach()
+endif ()
+
 # Enable testing
 if (URHO3D_TESTING)
     enable_testing ()
     add_definitions (-DURHO3D_TESTING)
+endif ()
+
+# Enable coverity scan modeling
+if ($ENV{COVERITY_SCAN_BRANCH})
+    add_definitions (-DCOVERITY_SCAN_MODEL)
 endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
@@ -294,6 +332,11 @@ if (NOT WIN32)
     add_definitions (-DKNET_UNIX)
 endif ()
 
+# Add definitions for Emscripten
+if (EMSCRIPTEN)
+    add_definitions (-DNO_POPEN)
+endif ()
+
 # Add definition for Direct3D11
 if (URHO3D_D3D11)
     set (URHO3D_OPENGL 0)
@@ -308,6 +351,15 @@ endif ()
 # Add definitions for GLEW
 if (NOT IOS AND NOT ANDROID AND NOT RPI AND URHO3D_OPENGL)
     add_definitions (-DGLEW_STATIC -DGLEW_NO_GLU)
+endif ()
+
+# Default library type is STATIC
+if (URHO3D_LIB_TYPE)
+    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
+endif ()
+if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+    set (URHO3D_LIB_TYPE STATIC)
+    add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
 # Add definition for AngelScript
@@ -353,13 +405,17 @@ if (URHO3D_URHO2D)
     add_definitions (-DURHO3D_URHO2D)
 endif ()
 
-# Default library type is STATIC
-if (URHO3D_LIB_TYPE)
-    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
+# Add definition for Database
+if (URHO3D_DATABASE_ODBC)
+    set (URHO3D_DATABASE_SQLITE 0)
+    find_package (ODBC REQUIRED)
+    set (URHO3D_C++11 1)
+    set (URHO3D_DATABASE 1)
+    add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_ODBC)
 endif ()
-if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
-    set (URHO3D_LIB_TYPE STATIC)
-    add_definitions (-DURHO3D_STATIC_DEFINE)
+if (URHO3D_DATABASE_SQLITE)
+    set (URHO3D_DATABASE 1)
+    add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
 endif ()
 
 # Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
@@ -377,6 +433,29 @@ if (RPI)
 endif ()
 
 # Platform and compiler specific options
+if (URHO3D_C++11)
+    add_definitions (-DURHO3D_CPP11)   # Note the define is NOT 'URHO3D_C++11'!
+    if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+        # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
+        foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
+            execute_process (COMMAND echo COMMAND ${CMAKE_CXX_COMPILER} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+            if (GCC_EXIT_CODE EQUAL 0)
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
+                break ()
+            endif ()
+        endforeach ()
+        if (NOT GCC_EXIT_CODE EQUAL 0)
+            execute_process (COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
+            message (FATAL_ERROR "Your GCC version ${GCC_VERSION} is too old to enable C++11 standard")
+        endif ()
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        # Cannot set CMAKE_CXX_FLAGS here directly because CMake uses the same flags for both C++ and Object-C languages, the latter does not support c++11 standard
+        # Workaround the problem by setting the compiler flags in the source properties for C++ language only in the setup_target() macro
+        set (CLANG_CXX_FLAGS -std=c++11)
+    elseif (MSVC80)
+        message (FATAL_ERROR "Your MSVC version is too told to enable C++11 standard")
+    endif ()
+endif ()
 if (IOS)
     # IOS-specific setup
     add_definitions (-DIOS)
@@ -464,9 +543,11 @@ else ()
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
                 endif ()
             endif ()
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
-            set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DASH_MBIT}")
+            if (NOT URHO3D_NOABI)
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
+                set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DASH_MBIT}")
+            endif ()
         endif ()
         if (EMSCRIPTEN)
             # Emscripten-specific setup
@@ -514,7 +595,7 @@ else ()
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Qunused-arguments")
         endif ()
         # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
-        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS (or hopefully it will be CentOS :)
+        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
         if (DEFINED ENV{CI} AND "$ENV{LINUX}")
             add_definitions (-D__extern_always_inline=inline)
         endif ()
@@ -534,9 +615,9 @@ endmacro ()
 
 # Macro for setting runtime output directories for tools
 macro (set_tool_output_directories)
-    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
+    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/${ARGN} RUNTIME PDB)
     if (DEST_RUNTIME_DIR STREQUAL bin)
-        set (DEST_RUNTIME_DIR bin/tool)
+        set (DEST_RUNTIME_DIR bin/tool/${ARGN})
     endif ()
 endmacro ()
 
@@ -592,138 +673,165 @@ endmacro ()
 
 include (GenerateExportHeader)
 
-# Macro for precompiling header (On MSVC, the dummy C++ implementation file for precompiling the header file would be generated if not already exists)
+# Macro for precompiling header (On MSVC, the dummy C++ or C implementation file for precompiling the header file would be generated if not already exists)
 # This macro should be called before the CMake target has been added
-# Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_file() macro
+# Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_files() macro
 macro (enable_pch HEADER_PATHNAME)
-    # Determine the precompiled header output filename
-    get_filename_component (HEADER_FILENAME ${HEADER_PATHNAME} NAME)
-    if (CMAKE_COMPILER_IS_GNUCXX)
-        # GNU g++
-        set (PCH_FILENAME ${HEADER_FILENAME}.gch)
-    else ()
-        # Clang or MSVC
-        set (PCH_FILENAME ${HEADER_FILENAME}.pch)
-    endif ()
+    # No op when PCH support is not enabled
+    if (URHO3D_PCH)
+        # Get the optional LANG parameter to indicate whether the header should be treated as C or C++ header, default to C++
+        if ("${ARGN}" STREQUAL C)   # Stringigy as the LANG paramater could be empty
+            set (EXT c)
+            set (LANG C)
+            set (LANG_H c-header)
+        else ()
+            # This is the default
+            set (EXT cpp)
+            set (LANG CXX)
+            set (LANG_H c++-header)
+        endif ()
+        # Relative path is resolved using CMAKE_CURRENT_SOURCE_DIR
+        if (IS_ABSOLUTE ${HEADER_PATHNAME})
+            set (ABS_HEADER_PATHNAME ${HEADER_PATHNAME})
+        else ()
+            set (ABS_HEADER_PATHNAME ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
+        endif ()
+        # Determine the precompiled header output filename
+        get_filename_component (HEADER_FILENAME ${HEADER_PATHNAME} NAME)
+        if (CMAKE_COMPILER_IS_GNUCXX)
+            # GNU g++
+            set (PCH_FILENAME ${HEADER_FILENAME}.gch)
+        else ()
+            # Clang or MSVC
+            set (PCH_FILENAME ${HEADER_FILENAME}.pch)
+        endif ()
 
-    if (MSVC)
-        get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
-        if (TARGET ${TARGET_NAME})
-            foreach (FILE ${SOURCE_FILES})
-                if (FILE MATCHES \\.cpp$)
-                    if (FILE MATCHES ${NAME_WE}\\.cpp$)
-                        # Precompiling header file
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")     # Need a leading space for appending
-                    else ()
-                        # Using precompiled header file
-                        get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
-                        if (NOT NO_PCH)
-                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
+        if (MSVC)
+            get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
+            if (TARGET ${TARGET_NAME})
+                foreach (FILE ${SOURCE_FILES})
+                    if (FILE MATCHES \\.${EXT}$)
+                        if (FILE MATCHES ${NAME_WE}\\.${EXT}$)
+                            # Precompiling header file
+                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")     # Need a leading space for appending
+                        else ()
+                            # Using precompiled header file
+                            get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
+                            if (NOT NO_PCH)
+                                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
+                            endif ()
                         endif ()
                     endif ()
-                endif ()
-            endforeach ()
-            unset (${TARGET_NAME}_HEADER_PATHNAME)
-        else ()
-            # The target has not been created yet, so set an internal variable to come back here again later
-            set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
-            # But proceed to add the dummy C++ implementation file if necessary
-            set (CXX_FILENAME ${NAME_WE}.cpp)
-            get_filename_component (PATH ${HEADER_PATHNAME} PATH)
-            if (PATH)
-                set (PATH ${PATH}/)
-            endif ()
-            list (FIND SOURCE_FILES ${PATH}${CXX_FILENAME} CXX_FILENAME_FOUND)
-            if (CXX_FILENAME_FOUND STREQUAL -1)
-                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${CXX_FILENAME} "// This is a generated file. DO NOT EDIT!\n\n#include \"${HEADER_FILENAME}\"")
-                list (APPEND SOURCE_FILES ${CXX_FILENAME})
-            endif ()
-        endif ()
-    elseif (XCODE)
-        if (TARGET ${TARGET_NAME})
-            # Precompiling and using precompiled header file
-            set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER YES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
-            unset (${TARGET_NAME}_HEADER_PATHNAME)
-        else ()
-            # The target has not been created yet, so set an internal variable to come back here again later
-            set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
-        endif ()
-    else ()
-        # GCC or Clang
-        if (TARGET ${TARGET_NAME})
-            # Precompiling header file
-            get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
-            get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
-            get_target_property (TYPE ${TARGET_NAME} TYPE)
-            if (TYPE MATCHES SHARED)
-                list (APPEND COMPILE_DEFINITIONS ${TARGET_NAME}_EXPORTS)
-                # todo: Reevaluate the replacement of this deprecated function (since CMake 2.8.12) when the CMake minimum required version is set to 2.8.12
-                # At the moment it seems using the function is the "only way" to get the export flags into a CMake variable
-                # Additionally, CMake implementation of 'VISIBILITY_INLINES_HIDDEN' has a bug (tested in 2.8.12.2) that it erroneously sets the flag for C compiler too
-                add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
-                if (NOT ANDROID)    # To cater for Android/CMake toolchain which already adds -fPIC flags into the CMake C and CXX compiler flags
-                    set (COMPILER_EXPORT_FLAGS "${COMPILER_EXPORT_FLAGS} -fPIC")
-                endif ()
-            endif ()
-            string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
-            string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
-            # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
-            file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
-            foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
-                # Generate *.rsp containing configuration specific compiler flags
-                string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x c++-header")
-                execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
-                file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
-                # Determine the dependency list
-                execute_process (COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME} RESULT_VARIABLE CXX_COMPILER_EXIT_CODE)
-                if (NOT CXX_COMPILER_EXIT_CODE EQUAL 0)
-                    message (FATAL_ERROR
-                        "The configured compiler toolchain in the build tree is not able to handle all the compiler flags required to build the project with PCH enabled. "
-                        "Please kindly update your compiler toolchain to its latest version. "
-                        "If you are using MinGW then make sure it is MinGW-W64 instead of MinGW-W32 or TDM-GCC (Code::Blocks default). "
-                        "Or disable the PCH build support by passing the '-DURHO3D_PCH=0' when retrying to configure/generate the build tree. "
-                        "However, if you think there is something wrong with our build system then kindly file a bug report to the project devs.")
-                endif ()
-                file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
-                string (REGEX REPLACE "^deps: *| *\\; +" ";" DEPS ${DEPS})
-                # Create the rule that depends on the included headers
-                add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
-                    COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}
-                    COMMAND ${CMAKE_COMMAND} -E touch ${HEADER_FILENAME}.${CONFIG}.pch.trigger
-                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp ${DEPS}
-                    COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
-            endforeach ()
-            # Using precompiled header file
-            if ($ENV{COVERITY_SCAN_BRANCH})
-                # Coverity scan does not support PCH so workaround by including the actual header file
-                set (ABS_PATH_PCH ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
+                endforeach ()
+                unset (${TARGET_NAME}_HEADER_PATHNAME)
             else ()
-                set (ABS_PATH_PCH ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME})
+                # The target has not been created yet, so set an internal variable to come back here again later
+                set (${TARGET_NAME}_HEADER_PATHNAME ${ARGV})
+                # But proceed to add the dummy C++ or C implementation file if necessary
+                set (${LANG}_FILENAME ${NAME_WE}.${EXT})
+                get_filename_component (PATH ${HEADER_PATHNAME} PATH)
+                if (PATH)
+                    set (PATH ${PATH}/)
+                endif ()
+                list (FIND SOURCE_FILES ${PATH}${${LANG}_FILENAME} ${LANG}_FILENAME_FOUND)
+                if (${LANG}_FILENAME_FOUND STREQUAL -1)
+                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${${LANG}_FILENAME} "// This is a generated file. DO NOT EDIT!\n\n#include \"${HEADER_FILENAME}\"")
+                    list (APPEND SOURCE_FILES ${${LANG}_FILENAME})
+                endif ()
             endif ()
-            foreach (FILE ${SOURCE_FILES})
-                if (FILE MATCHES \\.cpp$)
-                    get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
-                    if (NOT NO_PCH)
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${ABS_PATH_PCH}")
+        elseif (XCODE)
+            if (TARGET ${TARGET_NAME})
+                # Precompiling and using precompiled header file
+                set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER YES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER ${ABS_HEADER_PATHNAME})
+                unset (${TARGET_NAME}_HEADER_PATHNAME)
+            else ()
+                # The target has not been created yet, so set an internal variable to come back here again later
+                set (${TARGET_NAME}_HEADER_PATHNAME ${ARGV})
+            endif ()
+        else ()
+            # GCC or Clang
+            if (TARGET ${TARGET_NAME})
+                # Precompiling header file
+                get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
+                get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
+                get_target_property (TYPE ${TARGET_NAME} TYPE)
+                if (TYPE MATCHES SHARED)
+                    list (APPEND COMPILE_DEFINITIONS ${TARGET_NAME}_EXPORTS)
+                    # todo: Reevaluate the replacement of this deprecated function (since CMake 2.8.12) when the CMake minimum required version is set to 2.8.12
+                    # At the moment it seems using the function is the "only way" to get the export flags into a CMake variable
+                    # Additionally, CMake implementation of 'VISIBILITY_INLINES_HIDDEN' has a bug (tested in 2.8.12.2) that it erroneously sets the flag for C compiler too
+                    add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
+                    if (NOT ANDROID)    # To cater for Android/CMake toolchain which already adds -fPIC flags into the CMake C and CXX compiler flags
+                        set (COMPILER_EXPORT_FLAGS "${COMPILER_EXPORT_FLAGS} -fPIC")
+                    endif ()
+                elseif (PROJECT_NAME STREQUAL Urho3D AND NOT ${TARGET_NAME} STREQUAL Urho3D AND URHO3D_LIB_TYPE STREQUAL SHARED)
+                    # If it is one of the Urho3D library dependency then use the same PIC flag as Urho3D library
+                    if (NOT ANDROID)
+                        set (COMPILER_EXPORT_FLAGS -fPIC)
                     endif ()
                 endif ()
-            endforeach ()
-            unset (${TARGET_NAME}_HEADER_PATHNAME)
-        else ()
-            # The target has not been created yet, so set an internal variable to come back here again later
-            set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
-            # But proceed to add the dummy source file(s) to trigger the custom command output rule
-            if (CMAKE_CONFIGURATION_TYPES)
-                # Multi-config, trigger all rules and let the compiler to choose which precompiled header is suitable to use
-                foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES})
-                    list (APPEND TRIGGERS ${HEADER_FILENAME}.${CONFIG}.pch.trigger)
+                string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
+                string (REPLACE "\"" "\\\"" COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS})
+                string (REPLACE ";" "\" -I\"" INCLUDE_DIRECTORIES "-I\"${INCLUDE_DIRECTORIES}\"")
+                # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
+                file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
+                foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
+                    # Generate *.rsp containing configuration specific compiler flags
+                    string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
+                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
+                    execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
+                    file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
+                    # Determine the dependency list
+                    execute_process (COMMAND ${CMAKE_${LANG}_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${ABS_HEADER_PATHNAME} RESULT_VARIABLE ${LANG}_COMPILER_EXIT_CODE)
+                    if (NOT ${LANG}_COMPILER_EXIT_CODE EQUAL 0)
+                        message (FATAL_ERROR
+                            "The configured compiler toolchain in the build tree is not able to handle all the compiler flags required to build the project with PCH enabled. "
+                            "Please kindly update your compiler toolchain to its latest version. "
+                            "If you are using MinGW then make sure it is MinGW-W64 instead of MinGW-W32 or TDM-GCC (Code::Blocks default). "
+                            "Or disable the PCH build support by passing the '-DURHO3D_PCH=0' when retrying to configure/generate the build tree. "
+                            "However, if you think there is something wrong with our build system then kindly file a bug report to the project devs.")
+                    endif ()
+                    file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
+                    string (REGEX REPLACE "^deps: *| *\\; *" ";" DEPS ${DEPS})
+                    string (REGEX REPLACE "\\\\ " "\ " DEPS "${DEPS}")  # Need to stringify the second time to preserve the semicolons
+                    # Create the rule that depends on the included headers
+                    add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
+                        COMMAND ${CMAKE_${LANG}_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${ABS_HEADER_PATHNAME}
+                        COMMAND ${CMAKE_COMMAND} -E touch ${HEADER_FILENAME}.${CONFIG}.pch.trigger
+                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp ${DEPS}
+                        COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
                 endforeach ()
+                # Using precompiled header file
+                if ($ENV{COVERITY_SCAN_BRANCH})
+                    # Coverity scan does not support PCH so workaround by including the actual header file
+                    set (ABS_PATH_PCH ${ABS_HEADER_PATHNAME})
+                else ()
+                    set (ABS_PATH_PCH ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME})
+                endif ()
+                foreach (FILE ${SOURCE_FILES})
+                    if (FILE MATCHES \\.${EXT}$)
+                        get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
+                        if (NOT NO_PCH)
+                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include \"${ABS_PATH_PCH}\"")
+                        endif ()
+                    endif ()
+                endforeach ()
+                unset (${TARGET_NAME}_HEADER_PATHNAME)
             else ()
-                # Single-config, just trigger the corresponding rule matching the current build configuration
-                set (TRIGGERS ${HEADER_FILENAME}.${CMAKE_BUILD_TYPE}.pch.trigger)
+                # The target has not been created yet, so set an internal variable to come back here again later
+                set (${TARGET_NAME}_HEADER_PATHNAME ${ARGV})
+                # But proceed to add the dummy source file(s) to trigger the custom command output rule
+                if (CMAKE_CONFIGURATION_TYPES)
+                    # Multi-config, trigger all rules and let the compiler to choose which precompiled header is suitable to use
+                    foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES})
+                        list (APPEND TRIGGERS ${HEADER_FILENAME}.${CONFIG}.pch.trigger)
+                    endforeach ()
+                else ()
+                    # Single-config, just trigger the corresponding rule matching the current build configuration
+                    set (TRIGGERS ${HEADER_FILENAME}.${CMAKE_BUILD_TYPE}.pch.trigger)
+                endif ()
+                list (APPEND SOURCE_FILES ${TRIGGERS})
             endif ()
-            list (APPEND SOURCE_FILES ${TRIGGERS})
         endif ()
     endif ()
 endmacro ()
@@ -765,6 +873,15 @@ macro (setup_target)
             COMMAND mkdir -p ${DIRECTORY} && ln -sf $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
     endif ()
+
+    # Workaround CMake problem of sharing CMAKE_CXX_FLAGS for both C++ and Objective-C languages
+    if (CLANG_CXX_FLAGS)
+        foreach (FILE ${SOURCE_FILES})
+            if (FILE MATCHES \\.cpp$|\\.cc$)
+                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " ${CLANG_CXX_FLAGS}")
+            endif ()
+        endforeach ()
+    endif ()
 endmacro ()
 
 # Macro for checking the SOURCE_FILES variable is properly initialized
@@ -802,7 +919,7 @@ macro (setup_library)
         add_compiler_export_flags ()
     endif ()
 
-    if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+    if (PROJECT_NAME STREQUAL Urho3D)
         if (NOT ${TARGET_NAME} STREQUAL Urho3D)
             # Only interested in static library type, i.e. exclude shared and module library types
             if (LIB_TYPE MATCHES STATIC)
@@ -1263,6 +1380,11 @@ macro (define_dependency_libs TARGET)
             endif ()
         endif ()
 
+        # Database
+        if (URHO3D_DATABASE_ODBC)
+            list (APPEND LIBS ${ODBC_LIBRARIES})
+        endif ()
+
         # This variable value can either be 'Urho3D' target or an absolute path to an actual static/shared Urho3D library or empty (if we are building the library itself)
         # The former would cause CMake not only to link against the Urho3D library but also to add a dependency to Urho3D target
         if (URHO3D_LIBRARIES)
@@ -1310,13 +1432,13 @@ endmacro ()
 #  EXCLUDE_PATTERNS <list> - Use the provided patterns for excluding matched source files
 #  EXTRA_CPP_FILES <list> - Include the provided list of files into CPP_FILES result
 #  EXTRA_H_FILES <list> - Include the provided list of files into H_FILES result
-#  PCH <value> - Enable precompiled header support on the defined source files using the specified header file
+#  PCH <list> - Enable precompiled header support on the defined source files using the specified header file, the list is "<path/to/header> [C++|C]"
 #  PARENT_SCOPE - Glob source files in current directory but set the result in parent-scope's variable ${DIR}_CPP_FILES and ${DIR}_H_FILES instead
 #  RECURSE - Option to glob recursively
 #  GROUP - Option to group source files based on its relative path to the corresponding parent directory (only works when PARENT_SCOPE option is not in use)
 macro (define_source_files)
     # Parse the arguments
-    cmake_parse_arguments (ARG "PARENT_SCOPE;RECURSE;GROUP" "PCH" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
+    cmake_parse_arguments (ARG "PARENT_SCOPE;RECURSE;GROUP" "" "PCH;EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
 
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
     if (NOT ARG_GLOB_CPP_PATTERNS)
@@ -1484,7 +1606,7 @@ if (ANDROID)
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
-    foreach (I AndroidManifest.xml build.xml src res assets jni)
+    foreach (I AndroidManifest.xml build.xml custom_rules.xml src res assets jni)
         if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
             create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
         endif ()

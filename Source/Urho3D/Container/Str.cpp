@@ -28,6 +28,10 @@
 
 #include "../DebugNew.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable:6293)
+#endif
+
 namespace Urho3D
 {
 
@@ -559,7 +563,7 @@ Vector<String> String::Split(char separator) const
     return Split(CString(), separator);
 }
 
-void String::Join(const Vector<String>& subStrings, String glue)
+void String::Join(const Vector<String>& subStrings, const String& glue)
 {
     *this = Joined(subStrings, glue);
 }
@@ -1085,7 +1089,7 @@ Vector<String> String::Split(const char* str, char separator)
     return ret;
 }
 
-String String::Joined(const Vector<String>& subStrings, String glue)
+String String::Joined(const Vector<String>& subStrings, const String& glue)
 {
     if (subStrings.Empty())
         return String();

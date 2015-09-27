@@ -882,10 +882,15 @@ void UIElement::SetFocusMode(FocusMode mode)
 
 void UIElement::SetFocus(bool enable)
 {
-    if (focusMode_ < FM_FOCUSABLE)
+    // Invisible elements should not receive focus
+    if (focusMode_ < FM_FOCUSABLE || !IsVisibleEffective())
         enable = false;
 
     UI* ui = GetSubsystem<UI>();
+    // Can be null at exit time; no-op in that case
+    if (!ui)
+        return;
+
     if (enable)
     {
         if (ui->GetFocusElement() != this)
@@ -905,6 +910,11 @@ void UIElement::SetSelected(bool enable)
 
 void UIElement::SetVisible(bool enable)
 {
+    UI* ui = GetSubsystem<UI>();
+    // Can be null at exit time; no-op in that case
+    if (!ui)
+        return;
+
     if (enable != visible_)
     {
         visible_ = enable;
@@ -919,6 +929,14 @@ void UIElement::SetVisible(bool enable)
         eventData[P_ELEMENT] = this;
         eventData[P_VISIBLE] = visible_;
         SendEvent(E_VISIBLECHANGED, eventData);
+
+        // If the focus element becomes effectively hidden, clear focus
+        if (!enable)
+        {
+            UIElement* focusElement = ui->GetFocusElement();
+            if (focusElement && !focusElement->IsVisibleEffective())
+                focusElement->SetFocus(false);
+        }
     }
 }
 
@@ -1414,7 +1432,23 @@ float UIElement::GetDerivedOpacity() const
 
 bool UIElement::HasFocus() const
 {
-    return GetSubsystem<UI>()->GetFocusElement() == this;
+    UI* ui = GetSubsystem<UI>();
+    return ui ? ui->GetFocusElement() == this : false;
+}
+
+bool UIElement::IsVisibleEffective() const
+{
+    bool visible = visible_;
+    const UIElement* element = parent_;
+    
+    // Traverse the parent chain
+    while (visible && element)
+    {
+        visible &= element->visible_;
+        element = element->parent_;
+    }
+    
+    return visible;
 }
 
 const String& UIElement::GetAppliedStyle() const
@@ -1853,7 +1887,7 @@ int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin,
 void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
     const PODVector<int>& maxSizes, const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing)
 {
-    int numChildren = sizes.Size();
+    unsigned numChildren = sizes.Size();
     if (!numChildren)
         return;
     int targetTotalSize = targetSize - begin - end - (numChildren - 1) * spacing;
@@ -1865,7 +1899,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     float acc = 0.0f;
 
     // Initial pass
-    for (int i = 0; i < numChildren; ++i)
+    for (unsigned i = 0; i < numChildren; ++i)
     {
         int targetSize = (int)(targetChildSize * flexScales[i]);
         if (remainder)
@@ -1885,7 +1919,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     for (;;)
     {
         int actualTotalSize = 0;
-        for (int i = 0; i < numChildren; ++i)
+        for (unsigned i = 0; i < numChildren; ++i)
             actualTotalSize += sizes[i];
         int error = targetTotalSize - actualTotalSize;
         // Break if no error
@@ -1933,7 +1967,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     layoutMinSize_ = M_MAX_INT;
     layoutMaxSize_ = 0;
     int position = begin;
-    for (int i = 0; i < numChildren; ++i)
+    for (unsigned i = 0; i < numChildren; ++i)
     {
         positions[i] = position;
         position += sizes[i] + spacing;

@@ -70,6 +70,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/MemoryBuffer.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/PackageFile.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/Serializer.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/VectorBuffer.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Color.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Matrix3.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Matrix3x4.cpp
@@ -81,9 +82,6 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Vector3.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Vector4.cpp
     )
-
-    # MSVC does not do cross-compiling at the moment, so only force include using GCC/Clang approach
-    set_property (SOURCE ${MINI_URHO_CPP_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS " -include Urho3D.h")  # Need a leading space for appending
 
     # Check existence of stdint.h for LibCpuId
     include (CheckIncludeFiles)

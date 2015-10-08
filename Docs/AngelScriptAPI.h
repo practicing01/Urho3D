@@ -6886,6 +6886,7 @@ void AddManualDrawable(Drawable);
 void ApplyAttributes();
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool) const;
+Array<Drawable> GetAllDrawables(uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
@@ -9658,6 +9659,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetPoint(float) const;
+Vector3 GetPosition() const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -9677,6 +9679,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetInterceptNetworkUpdate(const String&, bool);
+void SetPosition(float);
 
 // Properties:
 bool animationEnabled;
@@ -9705,7 +9708,6 @@ Node node;
 /* readonly */
 uint numAttributes;
 ObjectAnimation objectAnimation;
-Vector3 position;
 /* readonly */
 int refs;
 float speed;
@@ -12103,6 +12105,8 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetFullImageRect();
+void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
@@ -12127,6 +12131,8 @@ Array<Variant> attributes;
 bool autoUpdate;
 /* readonly */
 StringHash baseType;
+BlendMode blendMode;
+IntRect border;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -12174,8 +12180,11 @@ FocusMode focusMode;
 uint format;
 int height;
 HorizontalAlignment horizontalAlignment;
+IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
+IntRect imageRect;
 int indent;
 int indentSpacing;
 /* readonly */
@@ -12226,6 +12235,8 @@ IntVector2 size;
 bool sortChildren;
 String style;
 bool temporary;
+Texture texture;
+bool tiled;
 TraversalMode traversalMode;
 /* readonly */
 StringHash type;
@@ -12347,6 +12358,8 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetFullImageRect();
+void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
@@ -12369,6 +12382,8 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
 StringHash baseType;
+BlendMode blendMode;
+IntRect border;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -12411,8 +12426,11 @@ bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
+IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
+IntRect imageRect;
 int indent;
 int indentSpacing;
 /* readonly */
@@ -12459,6 +12477,8 @@ IntVector2 size;
 bool sortChildren;
 String style;
 bool temporary;
+Texture texture;
+bool tiled;
 TraversalMode traversalMode;
 /* readonly */
 StringHash type;
@@ -13343,6 +13363,7 @@ void UnsubscribeFromAllEventsExcept(Array<String>);
 void UnsubscribeFromEvent(Object, const String&);
 void UnsubscribeFromEvent(const String&);
 void UnsubscribeFromEvents(Object);
+bool WriteDrawablesToOBJ(Array<Drawable>, File, bool = false);
 
 // Global properties
 DBAPI DBAPI;

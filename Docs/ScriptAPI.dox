@@ -8313,6 +8313,7 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool) const
+- Drawable@[]@ GetAllDrawables(uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
@@ -10757,6 +10758,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetPoint(float) const
+- Vector3 GetPosition() const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -10776,6 +10778,7 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
+- void SetPosition(float)
 
 Properties:
 
@@ -10795,7 +10798,6 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
-- Vector3 position
 - int refs // readonly
 - float speed
 - bool temporary
@@ -12853,6 +12855,8 @@ Methods:
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxSize(int, int)
@@ -12875,6 +12879,8 @@ Properties:
 - Variant[] attributes
 - bool autoUpdate
 - StringHash baseType // readonly
+- BlendMode blendMode
+- IntRect border
 - bool bringToBack
 - bool bringToFront
 - Node@ cameraNode // readonly
@@ -12907,7 +12913,10 @@ Properties:
 - uint format
 - int height
 - HorizontalAlignment horizontalAlignment
+- IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
+- IntRect imageRect
 - int indent
 - int indentSpacing
 - int indentWidth // readonly
@@ -12949,6 +12958,8 @@ Properties:
 - bool sortChildren
 - String style
 - bool temporary
+- Texture@ texture
+- bool tiled
 - TraversalMode traversalMode
 - StringHash type // readonly
 - String typeName // readonly
@@ -13063,6 +13074,8 @@ Methods:
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxSize(int, int)
@@ -13083,6 +13096,8 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - StringHash baseType // readonly
+- BlendMode blendMode
+- IntRect border
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -13112,7 +13127,10 @@ Properties:
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
+- IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
+- IntRect imageRect
 - int indent
 - int indentSpacing
 - int indentWidth // readonly
@@ -13152,6 +13170,8 @@ Properties:
 - bool sortChildren
 - String style
 - bool temporary
+- Texture@ texture
+- bool tiled
 - TraversalMode traversalMode
 - StringHash type // readonly
 - String typeName // readonly
@@ -14006,6 +14026,7 @@ Properties:
 - void UnsubscribeFromEvent(Object@, const String&)
 - void UnsubscribeFromEvent(const String&)
 - void UnsubscribeFromEvents(Object@)
+- bool WriteDrawablesToOBJ(Drawable@[]@, File@, bool = false)
 \section ScriptAPI_GlobalProperties Global properties
 - DBAPI DBAPI
 - Audio@ audio

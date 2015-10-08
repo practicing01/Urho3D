@@ -58,8 +58,8 @@
 #include "../Urho2D/Urho2D.h"
 #endif
 
-#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
-#include <emscripten.h>
+#if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
+#include <emscripten/emscripten.h>
 #endif
 
 #include "../DebugNew.h"
@@ -680,6 +680,7 @@ void Engine::ApplyFrameLimit()
 
     long long elapsed = 0;
 
+#ifndef __EMSCRIPTEN__
     // Perform waiting loop if maximum FPS set
     if (maxFps)
     {
@@ -701,6 +702,7 @@ void Engine::ApplyFrameLimit()
             }
         }
     }
+#endif
 
     elapsed = frameTimer_.GetUSec(true);
 #ifdef URHO3D_TESTING
@@ -916,7 +918,7 @@ void Engine::DoExit()
         graphics->Close();
 
     exiting_ = true;
-#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
+#if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
     emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
 #endif
 }

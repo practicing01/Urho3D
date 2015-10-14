@@ -2413,6 +2413,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -2420,15 +2421,19 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -2438,7 +2443,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
@@ -2463,6 +2467,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -2478,16 +2483,20 @@ Methods:
 - void RemoveAnimationState(AnimationState@)
 - void RemoveAnimationState(const String&)
 - void RemoveAnimationState(uint)
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetMorphWeights()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetMorphWeight(uint, float)
@@ -2500,7 +2509,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -2550,6 +2558,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -2559,16 +2568,20 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimation(const String&, LoopMode2D = LM_DEFAULT)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFlip(bool, bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
@@ -2582,7 +2595,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -2645,7 +2657,6 @@ Methods:
 Properties:
 
 - String animationName
-- StringHash baseType // readonly
 - String category // readonly
 - float length
 - uint memoryUse // readonly
@@ -2675,6 +2686,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetAutoFade(const String&) const
@@ -2699,15 +2711,19 @@ Methods:
 - bool Play(const String&, uint8, bool, float = 0.0f)
 - bool PlayExclusive(const String&, uint8, bool, float = 0.0f)
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetAutoFade(const String&, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
@@ -2729,7 +2745,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -2769,7 +2784,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -2895,7 +2909,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool initialized // readonly
 - bool interpolation // readonly
@@ -2944,6 +2957,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -2953,15 +2967,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -2972,7 +2990,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -3040,6 +3057,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -3063,9 +3081,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -3076,9 +3096,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -3106,7 +3128,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -3199,6 +3220,7 @@ Methods:
 - void Define(const Vector3&)
 - void Define(const Vector3&, const Vector3&)
 - void Define(float, float)
+- bool Defined() const
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const Vector3&) const
@@ -3219,7 +3241,6 @@ Methods:
 Properties:
 
 - Vector3 center // readonly
-- bool defined
 - Vector3 halfSize // readonly
 - Vector3 max
 - Vector3 min
@@ -3242,6 +3263,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -3265,9 +3287,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -3278,9 +3302,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -3311,7 +3337,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -3405,6 +3430,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetDistance(const Vector3&) const
@@ -3417,16 +3443,20 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - Vector3 ScreenToWorldPoint(const Vector3&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetOrthoSize(const Vector2&)
@@ -3440,7 +3470,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoAspectRatio
-- StringHash baseType // readonly
 - String category // readonly
 - Plane clipPlane
 - Matrix3x4 effectiveWorldTransform // readonly
@@ -3505,6 +3534,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -3528,9 +3558,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -3541,9 +3573,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCheckedOffset(int, int)
 - void SetDeepEnabled(bool)
@@ -3572,7 +3606,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -3663,6 +3696,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -3671,15 +3705,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCenter(float, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
@@ -3692,7 +3730,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - Vector2 center
@@ -3729,6 +3766,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -3738,15 +3776,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetVertex(uint, const Vector2&)
@@ -3759,7 +3801,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -3796,6 +3837,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -3804,15 +3846,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCenter(float, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
@@ -3823,7 +3869,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - Vector2 center
@@ -3860,6 +3905,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -3868,15 +3914,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetVertices(const Vector2&, const Vector2&)
@@ -3887,7 +3937,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -3924,6 +3973,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -3933,15 +3983,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetVertex(uint, const Vector2&)
@@ -3954,7 +4008,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -3990,6 +4043,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -3998,15 +4052,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetBox(const Vector3&, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
 - void SetCapsule(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
@@ -4028,7 +4086,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -4061,6 +4118,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4069,15 +4127,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4087,7 +4149,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -4171,6 +4232,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4179,15 +4241,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4197,7 +4263,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -4228,7 +4293,6 @@ Methods:
 Properties:
 
 - String address // readonly
-- StringHash baseType // readonly
 - float bytesInPerSec // readonly
 - float bytesOutPerSec // readonly
 - String category // readonly
@@ -4271,7 +4335,6 @@ Properties:
 
 - bool autoVisibleOnError
 - BorderImage@ background // readonly
-- StringHash baseType // readonly
 - String category // readonly
 - Button@ closeButton // readonly
 - String commandInterpreter
@@ -4300,6 +4363,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4308,15 +4372,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4327,7 +4395,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector3 axis // writeonly
-- StringHash baseType // readonly
 - String category // readonly
 - float cfm
 - ConstraintType constraintType
@@ -4366,6 +4433,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4374,15 +4442,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4392,7 +4464,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4420,6 +4491,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4428,15 +4500,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4446,7 +4522,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -4478,6 +4553,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4486,15 +4562,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4505,7 +4585,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4535,6 +4614,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4543,15 +4623,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4561,7 +4645,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4592,6 +4675,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4600,15 +4684,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4619,7 +4707,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float correctionFactor
@@ -4651,6 +4738,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4659,15 +4747,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4677,7 +4769,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -4709,6 +4800,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4717,15 +4809,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4737,7 +4833,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector2 axis
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enableLimit
@@ -4771,6 +4866,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4779,15 +4875,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4797,7 +4897,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4830,6 +4929,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4838,15 +4938,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4857,7 +4961,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enableLimit
@@ -4891,6 +4994,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4899,15 +5003,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4917,7 +5025,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4948,6 +5055,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -4956,15 +5064,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -4975,7 +5087,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -5005,6 +5116,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -5013,15 +5125,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -5033,7 +5149,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector2 axis
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -5085,6 +5200,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -5093,16 +5209,20 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetTarget()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -5115,7 +5235,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - Vector3 desiredVelocity // readonly
 - bool enabled
@@ -5162,6 +5281,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetDistanceToWall(const Vector3&, float, int)
@@ -5177,17 +5297,21 @@ Methods:
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, int, uint = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, int)
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetCrowdTarget(Node@ = null)
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - void SetAreaCost(uint, uint, float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCrowdTarget(const Vector3&, Node@ = null)
 - void SetCrowdVelocity(const Vector3&, Node@ = null)
@@ -5202,7 +5326,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -5258,6 +5381,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -5281,9 +5405,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -5294,9 +5420,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -5326,7 +5454,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -5426,6 +5553,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -5436,15 +5564,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -5454,7 +5586,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -5512,7 +5643,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint poolSize
 - bool pooling // readonly
@@ -5532,7 +5662,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool connected // readonly
 - String connectionString // readonly
@@ -5570,7 +5699,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - XMLFile@ defaultStyle
 - uint mode
@@ -5607,6 +5735,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -5615,15 +5744,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -5633,7 +5766,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -5659,6 +5791,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -5669,16 +5802,20 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllDecals()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveDecals(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -5688,7 +5825,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -5808,6 +5944,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -5817,15 +5954,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -5835,7 +5976,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -5874,6 +6014,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -5883,15 +6024,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -5901,7 +6046,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -5949,6 +6093,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -5975,11 +6120,13 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveItem(UIElement@)
 - void RemoveItem(uint)
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -5991,9 +6138,11 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAccelerator(int, int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -6027,7 +6176,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -6136,6 +6284,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -6149,16 +6298,20 @@ Methods:
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - void SetAreaCost(uint, float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -6172,7 +6325,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - String category // readonly
 - float cellHeight
@@ -6223,7 +6375,6 @@ Methods:
 Properties:
 
 - bool autoExit
-- StringHash baseType // readonly
 - String category // readonly
 - bool exiting // readonly
 - bool headless // readonly
@@ -6315,7 +6466,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - bool eof // readonly
@@ -6343,7 +6493,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - Button@ cancelButton // readonly
 - String category // readonly
 - XMLFile@ defaultStyle
@@ -6390,7 +6539,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String currentDir
 - bool executeConsoleCommands
@@ -6432,7 +6580,6 @@ Methods:
 Properties:
 
 - IntVector2 absoluteGlyphOffset
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -6482,7 +6629,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool empty // readonly
 - IndexBuffer@ indexBuffer
@@ -6523,7 +6669,6 @@ Methods:
 Properties:
 
 - String apiName // readonly
-- StringHash baseType // readonly
 - bool borderless // readonly
 - String category // readonly
 - bool deferredSupport // readonly
@@ -6653,7 +6798,6 @@ Methods:
 Properties:
 
 - bool array // readonly
-- StringHash baseType // readonly
 - String category // readonly
 - uint components // readonly
 - bool compressed // readonly
@@ -6686,7 +6830,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool dynamic // readonly
 - uint indexCount // readonly
@@ -6726,7 +6869,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool focus // readonly
 - JoystickState@[] joysticks // readonly
@@ -6811,7 +6953,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -6883,6 +7024,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -6892,15 +7034,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -6911,7 +7057,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - float brightness
 - bool castShadows
@@ -6978,6 +7123,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7001,9 +7147,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -7014,9 +7162,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -7044,7 +7194,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -7156,6 +7305,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7184,11 +7334,13 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveItem(UIElement@, uint = 0)
 - void RemoveItem(uint)
+- void RemoveObjectAnimation()
 - void RemoveSelection(uint)
 - void ResetDeepEnabled()
 - void ResetToDefault()
@@ -7200,9 +7352,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -7236,7 +7390,6 @@ Properties:
 - bool autoDisableChildren
 - float autoDisableThreshold
 - int baseIndent
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -7346,7 +7499,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String language // readonly
 - int languageIndex // readonly
@@ -7373,7 +7525,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String lastMessage // readonly
 - int level
@@ -7413,7 +7564,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - CullMode cullMode
 - BiasParameters depthBias
@@ -7556,6 +7706,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -7579,9 +7730,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -7593,9 +7746,11 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAccelerator(int, int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -7629,7 +7784,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -7725,7 +7879,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String message
 - int refs // readonly
@@ -7752,7 +7905,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - BoundingBox boundingBox
 - String category // readonly
 - Vector3[] geometryCenters
@@ -7779,6 +7931,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -7787,15 +7940,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -7806,7 +7963,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox
 - String category // readonly
 - bool enabled
@@ -7833,6 +7989,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -7841,15 +7998,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -7859,7 +8020,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -7891,6 +8051,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
@@ -7904,16 +8065,20 @@ Methods:
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - void SetAreaCost(uint, float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -7927,7 +8092,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - String category // readonly
 - float cellHeight
@@ -7982,7 +8146,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - Connection@[]@ clientConnections // readonly
 - String packageCacheDir
@@ -8007,6 +8170,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -8015,15 +8179,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -8035,7 +8203,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - float basePriority
-- StringHash baseType // readonly
 - String category // readonly
 - float distanceFactor
 - bool enabled
@@ -8069,6 +8236,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Node@ GetChild(const String&, bool = false) const
@@ -8091,11 +8259,13 @@ Methods:
 - Vector3 LocalToWorld(const Vector4&) const
 - Vector2 LocalToWorld2D(const Vector2&) const
 - bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD)
+- void MarkDirty()
 - void MarkNetworkUpdate() const
 - void Pitch(float, TransformSpace = TS_LOCAL)
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllComponents()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(Node@)
 - void RemoveChildren(bool, bool, bool)
 - void RemoveComponent(Component@)
@@ -8103,6 +8273,7 @@ Methods:
 - void RemoveComponents(bool, bool)
 - void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
@@ -8119,9 +8290,11 @@ Methods:
 - void Scale(float)
 - void Scale2D(const Vector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -8154,7 +8327,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - Node@[] children // readonly
 - Component@[] components // readonly
@@ -8208,7 +8380,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - int refs // readonly
 - StringHash type // readonly
@@ -8236,7 +8407,6 @@ Methods:
 Properties:
 
 - Variant[] attributeAnimations // readonly
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -8260,6 +8430,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -8268,15 +8439,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -8286,7 +8461,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -8317,6 +8491,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Drawable@[]@ GetDrawables(const BoundingBox&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
@@ -8331,16 +8506,20 @@ Methods:
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
 - RayQueryResult RaycastSingle(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
 - void RemoveManualDrawable(Drawable@)
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetSize(const BoundingBox&, uint)
@@ -8351,7 +8530,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -8378,6 +8556,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -8386,15 +8565,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -8405,7 +8588,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - bool bidirectional
 - String category // readonly
 - bool enabled
@@ -8437,7 +8619,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - String name // readonly
@@ -8478,7 +8659,6 @@ Properties:
 
 - float activeTime
 - float animationLodBias
-- StringHash baseType // readonly
 - String category // readonly
 - Vector3 constantForce
 - float dampingForce
@@ -8531,7 +8711,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -8554,6 +8733,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -8564,7 +8744,9 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllParticles()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void Reset()
 - void ResetEmissionTimer()
 - void ResetToDefault()
@@ -8572,9 +8754,11 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -8585,7 +8769,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -8636,6 +8819,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -8645,15 +8829,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -8663,7 +8851,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -8750,6 +8937,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -8763,16 +8951,20 @@ Methods:
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float, uint = 0xffff)
 - PhysicsRaycastResult RaycastSingle(const Ray&, float, uint = 0xffff)
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveCachedGeometry(Model@)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - PhysicsRaycastResult SphereCast(const Ray&, float, float, uint = 0xffff)
@@ -8785,7 +8977,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -8818,6 +9009,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -8831,15 +9023,19 @@ Methods:
 - PhysicsRaycastResult2D[]@ Raycast(const Vector2&, const Vector2&, uint = 0xffff)
 - PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint = 0xffff)
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -8851,7 +9047,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoClearForces
-- StringHash baseType // readonly
 - String category // readonly
 - bool continuousPhysics
 - bool drawAabb
@@ -9164,7 +9359,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - Material@ defaultLightRamp // readonly
 - Material@ defaultLightSpot // readonly
@@ -9218,7 +9412,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -9264,7 +9457,6 @@ Methods:
 Properties:
 
 - bool autoReloadResources
-- StringHash baseType // readonly
 - String category // readonly
 - int finishBackgroundResourcesMs
 - uint[] memoryBudget
@@ -9325,6 +9517,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -9335,16 +9528,20 @@ Methods:
 - void MarkNetworkUpdate() const
 - void ReAddBodyToWorld()
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetForces()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetCollisionLayerAndMask(uint, uint)
 - void SetInterceptNetworkUpdate(const String&, bool)
@@ -9362,7 +9559,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - float ccdMotionThreshold
 - float ccdRadius
@@ -9414,6 +9610,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -9422,15 +9619,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -9443,7 +9644,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool awake
-- StringHash baseType // readonly
 - BodyType2D bodyType
 - bool bullet
 - String category // readonly
@@ -9487,6 +9687,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - Node@ GetChild(const String&, bool = false) const
@@ -9527,6 +9728,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllComponents()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(Node@)
 - void RemoveChildren(bool, bool, bool)
 - void RemoveComponent(Component@)
@@ -9534,6 +9736,7 @@ Methods:
 - void RemoveComponents(bool, bool)
 - void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
 - void Rotate(const Quaternion&, TransformSpace = TS_LOCAL)
@@ -9549,9 +9752,11 @@ Methods:
 - void Scale(float)
 - void Scale2D(const Vector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetPosition2D(float, float)
@@ -9591,7 +9796,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - Node@[] children // readonly
@@ -9655,7 +9859,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - Scene@ defaultScene
 - ScriptFile@ defaultScriptFile
@@ -9682,7 +9885,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool compiled // readonly
 - uint memoryUse // readonly
@@ -9708,6 +9910,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -9718,15 +9921,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -9736,7 +9943,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - String className
 - bool enabled
@@ -9775,6 +9981,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -9798,9 +10005,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -9811,9 +10020,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -9842,7 +10053,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Button@ backButton // readonly
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -9938,6 +10148,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -9961,9 +10172,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -9974,9 +10187,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -10006,7 +10221,6 @@ Properties:
 - Variant[] attributes
 - bool autoDisableChildren
 - float autoDisableThreshold
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -10115,7 +10329,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - uint numAttributes // readonly
 - int refs // readonly
@@ -10190,6 +10403,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -10199,15 +10413,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -10217,7 +10435,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -10268,6 +10485,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -10291,9 +10509,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -10304,9 +10524,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -10334,7 +10556,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -10428,6 +10649,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -10436,15 +10658,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void Update(float, float)
@@ -10455,7 +10681,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -10488,7 +10713,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool compressed // readonly
 - float frequency // readonly
@@ -10516,6 +10740,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -10524,15 +10749,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -10542,7 +10771,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -10567,6 +10795,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -10579,15 +10808,19 @@ Methods:
 - void Play(Sound@, float, float)
 - void Play(Sound@, float, float, float)
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void Stop()
@@ -10600,7 +10833,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoRemove
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -10632,6 +10864,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -10644,16 +10877,20 @@ Methods:
 - void Play(Sound@, float, float)
 - void Play(Sound@, float, float, float)
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDistanceAttenuation(float, float, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
@@ -10667,7 +10904,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoRemove
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -10754,6 +10990,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -10765,17 +11002,21 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Move(float)
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveControlPoint(Node@)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void Reset()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetPosition(float)
@@ -10786,7 +11027,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - Node@ controlledNode
 - bool enabled
@@ -10819,6 +11059,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -10840,9 +11081,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -10851,9 +11094,11 @@ Methods:
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
@@ -10879,7 +11124,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - bool bringToBack
 - bool bringToFront
@@ -10939,7 +11183,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - Vector2 hotSpot
 - uint memoryUse // readonly
@@ -10969,7 +11212,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -10992,6 +11234,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -11003,15 +11246,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -11021,7 +11268,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -11067,6 +11313,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -11077,16 +11324,20 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllInstanceNodes()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
 - void RemoveInstanceNode(Node@)
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -11096,7 +11347,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -11143,6 +11393,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -11152,15 +11403,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetFlip(bool, bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
@@ -11172,7 +11427,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -11300,7 +11554,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool desktop
 - uint memoryUse // readonly
@@ -11337,6 +11590,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetHeight(const Vector3&) const
@@ -11348,15 +11602,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - IntVector2 WorldToHeightMap(const Vector3&) const
@@ -11367,7 +11625,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - bool castShadows
 - String category // readonly
 - float drawDistance
@@ -11413,6 +11670,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -11422,15 +11680,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -11440,7 +11702,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -11486,6 +11747,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -11509,9 +11771,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -11522,9 +11786,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -11554,7 +11820,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoLocalizable
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -11654,6 +11919,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -11663,16 +11929,20 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetFont(Font@, int)
 - bool SetFont(const String&, int)
@@ -11684,7 +11954,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -11753,7 +12022,6 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - uint components // readonly
@@ -11798,7 +12066,6 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - uint components // readonly
@@ -11843,7 +12110,6 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - uint components // readonly
@@ -11888,7 +12154,6 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - uint components // readonly
@@ -11949,6 +12214,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -11959,15 +12225,19 @@ Methods:
 - void MarkNetworkUpdate() const
 - bool PositionToTileIndex(int&, int&, const Vector2&) const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - Vector2 TileIndexToPosition(int, int) const
@@ -11978,7 +12248,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -12020,6 +12289,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -12033,15 +12303,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - const String& GetProperty(const String&) const
@@ -12052,7 +12326,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int drawOrder
 - bool enabled
@@ -12106,7 +12379,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - float elapsedTime // readonly
 - uint frameNumber // readonly
@@ -12142,7 +12414,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -12169,6 +12440,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -12192,9 +12464,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -12205,9 +12479,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -12233,7 +12509,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -12344,7 +12619,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String clipBoardText
 - Cursor@ cursor
@@ -12385,6 +12659,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -12408,9 +12683,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -12421,9 +12698,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -12449,7 +12728,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -12536,7 +12814,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - InterpMethod interpolationMethod
 - uint memoryUse // readonly
@@ -12780,7 +13057,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool dynamic // readonly
 - uint elementMask // readonly
@@ -12809,6 +13085,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -12833,9 +13110,11 @@ Methods:
 - void QueueUpdate()
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -12846,9 +13125,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -12878,7 +13159,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoUpdate
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -12986,7 +13266,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - Camera@ camera
 - String category // readonly
 - bool drawDebug
@@ -13029,6 +13308,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - UIElement@ GetChild(const String&, bool = false) const
@@ -13052,9 +13332,11 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -13065,9 +13347,11 @@ Methods:
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetDeepEnabled(bool)
 - void SetEnabledRecursive(bool)
@@ -13095,7 +13379,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -13283,7 +13566,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -13337,6 +13619,7 @@ Methods:
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -13346,15 +13629,19 @@ Methods:
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
+- void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
@@ -13368,7 +13655,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox
 - bool castShadows
 - String category // readonly

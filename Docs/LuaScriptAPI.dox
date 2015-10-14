@@ -221,15 +221,20 @@ namespace Urho3D
 Methods:
 
 - void SetAnimationEnabled(bool enable)
+- void SetAnimationTime(float time)
 - void SetObjectAnimation(ObjectAnimation* objectAnimation)
 - void SetAttributeAnimation(const String name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
 - void SetAttributeAnimationWrapMode(const String name, WrapMode wrapMode)
 - void SetAttributeAnimationSpeed(const String name, float speed)
+- void SetAttributeAnimationTime(const String name, float time)
+- void RemoveObjectAnimation()
+- void RemoveAttributeAnimation(const String name)
 - bool GetAnimationEnabled() const
 - ObjectAnimation* GetObjectAnimation() const
 - ValueAnimation* GetAttributeAnimation(const String name) const
 - WrapMode GetAttributeAnimationWrapMode(const String name) const
 - float GetAttributeAnimationSpeed(const String name) const
+- float GetAttributeAnimationTime(const String name) const
 
 Properties:
 
@@ -686,6 +691,7 @@ Methods:
 - void Define(const Frustum& frustum)
 - void Define(const Polyhedron& poly)
 - void Define(const Sphere& sphere)
+- bool Defined() const
 - void Merge(const Vector3& point)
 - void Merge(const BoundingBox& box)
 - void Merge(const Frustum& frustum)
@@ -712,7 +718,6 @@ Properties:
 
 - Vector3 min
 - Vector3 max
-- bool defined
 - Vector3 center (readonly)
 - Vector3 size (readonly)
 - Vector3 halfSize (readonly)
@@ -3824,7 +3829,6 @@ Properties:
 Methods:
 
 - StringHash GetType() const
-- StringHash GetBaseType() const
 - const String GetTypeName() const
 - const String GetCategory() const
 - void SendEvent(const String eventName, VariantMap* eventData = 0)
@@ -3832,7 +3836,6 @@ Methods:
 Properties:
 
 - StringHash type (readonly)
-- StringHash baseType (readonly)
 - const String typeName (readonly)
 - const String category (readonly)
 

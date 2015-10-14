@@ -355,7 +355,6 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
 {
     RegisterRefCounted<T>(engine, className);
     engine->RegisterObjectMethod(className, "StringHash get_type() const", asMETHODPR(T, GetType, () const, StringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "StringHash get_baseType() const", asMETHODPR(T, GetBaseType, () const, StringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(ObjectSendEvent<T>), asCALL_CDECL_OBJLAST);
@@ -473,6 +472,11 @@ template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(T, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(T, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(T, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveObjectAnimation()", asMETHODPR(T, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveAttributeAnimation(const String&in)", asMETHODPR(T, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAnimationTime(float time)", asMETHODPR(T, SetAnimationTime, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(T, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(T, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from Component.
@@ -600,7 +604,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
         const Vector<SharedPtr<Component> >& components = node->GetComponents();
         for (Vector<SharedPtr<Component> >::ConstIterator j = components.Begin(); j != components.End(); ++j)
         {
-            if ((*j)->GetType() == ScriptInstance::GetTypeStatic())
+            if ((*j)->IsInstanceOf<ScriptInstance>())
             {
                 ScriptInstance* instance = static_cast<ScriptInstance*>(j->Get());
                 if (instance->IsA(className))

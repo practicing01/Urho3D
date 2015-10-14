@@ -54,8 +54,7 @@ enum TransformSpace
 /// %Scene node that may contain components and child nodes.
 class URHO3D_API Node : public Animatable
 {
-    OBJECT(Node);
-    BASEOBJECT(Node);
+    OBJECT(Node, Animatable);
 
     friend class Connection;
 
@@ -561,9 +560,8 @@ protected:
     virtual void OnAttributeAnimationAdded();
     /// Handle attribute animation removed.
     virtual void OnAttributeAnimationRemoved();
-    /// Set object attribute animation internal.
-    virtual void
-        SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    /// Find target of an attribute animation from object hierarchy by name.
+    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
 
     /// Network update queued flag.
     bool networkUpdate_;

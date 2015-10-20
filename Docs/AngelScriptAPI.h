@@ -6706,6 +6706,7 @@ Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 Component GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
+Component GetParentComponent(const String&, bool = false) const;
 ScriptObject GetScriptObject() const;
 ScriptObject GetScriptObject(const String&) const;
 bool HasComponent(const String&) const;
@@ -8308,6 +8309,7 @@ Array<Component> GetComponents(const String&, bool = false) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 Node GetNode(uint) const;
 Component GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
+Component GetParentComponent(const String&, bool = false) const;
 ScriptObject GetScriptObject() const;
 ScriptObject GetScriptObject(const String&) const;
 bool HasComponent(const String&) const;
@@ -12418,6 +12420,7 @@ Vector2 WorldToScreenPoint(const Vector3&) const;
 Camera camera;
 /* readonly */
 String category;
+Camera cullCamera;
 bool drawDebug;
 IntRect rect;
 /* readonly */

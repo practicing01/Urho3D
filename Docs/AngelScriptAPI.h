@@ -7560,6 +7560,7 @@ bool temporary;
 StringHash type;
 /* readonly */
 String typeName;
+bool updateEnabled;
 /* readonly */
 int weakRefs;
 };
@@ -7640,6 +7641,7 @@ bool temporary;
 StringHash type;
 /* readonly */
 String typeName;
+bool updateEnabled;
 uint velocityIterations;
 bool warmStarting;
 /* readonly */
@@ -7781,6 +7783,7 @@ void Clear();
 void Clip(const Rect&);
 void Define(const Vector2&);
 void Define(const Vector2&, const Vector2&);
+bool Defined() const;
 bool Equals(const Rect&) const;
 Intersection IsInside(const Vector2&) const;
 void Merge(const Rect&);
@@ -7791,7 +7794,6 @@ Vector4 ToVector4() const;
 float bottom;
 /* readonly */
 Vector2 center;
-bool defined;
 /* readonly */
 Vector2 halfSize;
 float left;
@@ -7971,6 +7973,7 @@ bool specularLighting;
 int textureAnisotropy;
 TextureFilterMode textureFilterMode;
 int textureQuality;
+bool threadedOcclusion;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -9747,6 +9750,7 @@ void Define(const Frustum&);
 void Define(const Polyhedron&);
 void Define(const Sphere&);
 void Define(const Vector3&, float);
+bool Defined() const;
 float Distance(const Vector3&) const;
 Intersection IsInside(const BoundingBox&) const;
 Intersection IsInside(const Sphere&) const;
@@ -9760,7 +9764,6 @@ void Merge(const Vector3&);
 
 // Properties:
 Vector3 center;
-bool defined;
 float radius;
 };
 

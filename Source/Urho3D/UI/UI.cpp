@@ -924,7 +924,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                     {
                         int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_ :
                             element->GetScreenPosition().y_;
-                        int layoutMaxSize = current->GetLayoutMaxSize();
+                        int layoutMaxSize = current->GetLayoutElementMaxSize();
 
                         if (screenPos < 0 && layoutMaxSize > 0)
                         {
@@ -1157,6 +1157,9 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
             if (!HasModalElement())
                 SetFocusElement(0);
             SendClickEvent(E_UIMOUSECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
+            
+            if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
+                SendClickEvent(E_UIMOUSEDOUBLECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
         }
 
         lastMouseButtons_ = buttons;

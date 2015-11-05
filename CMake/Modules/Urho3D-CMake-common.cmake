@@ -46,37 +46,41 @@ include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
 mark_as_advanced (URHO3D_C++11)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
-if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
-    # On non-MSVC compiler, default to build 64-bit when the chosen compiler toolchain in the build tree has a 64-bit build environment
-    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
-    string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
-    if (matched)
-        set (URHO3D_DEFAULT_64BIT TRUE)
+if (NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
+    if (MSVC)
+        # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
+        if (CMAKE_GENERATOR MATCHES Win64)
+            set (URHO3D_DEFAULT_64BIT TRUE)
+        else ()
+            set (URHO3D_DEFAULT_64BIT FALSE)
+        endif ()
     else ()
-        set (URHO3D_DEFAULT_64BIT FALSE)
+        # On non-MSVC compiler, default to build 64-bit when the chosen compiler toolchain in the build tree has a 64-bit build environment
+        execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+        string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
+        if (matched)
+            set (URHO3D_DEFAULT_64BIT TRUE)
+        else ()
+            set (URHO3D_DEFAULT_64BIT FALSE)
+        endif ()
+        # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
+        # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
+        string (REGEX MATCH "#define +__(arm|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
+        if (matched OR IOS)     # Assume iOS is always on ARM for now
+            set (ARM TRUE)
+        else ()
+            set (ARM FALSE)
+        endif ()
+        set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
+        # The other arm platform that Urho3D supports that is not Android/iOS is Raspberry Pi at the moment
+        if (ARM AND NOT ANDROID AND NOT IOS)
+            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
+            set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
+        endif ()
     endif ()
     set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
-    # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
-    # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
-    string (REGEX MATCH "#define +__(arm|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
-    if (matched OR IOS)     # Assume iOS is always on ARM for now
-        set (ARM TRUE)
-    else ()
-        set (ARM FALSE)
-    endif ()
-    set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
-    # The other arm platform that Urho3D supports that is not Android/iOS is Raspberry Pi at the moment
-    if (ARM AND NOT ANDROID AND NOT IOS)
-        # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
-        set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
-    endif ()
 endif ()
-if (MINGW OR ANDROID OR RPI OR EMSCRIPTEN)
-    # This build option is not available on MinGW, Android, Raspberry-Pi, and Emscripten platforms as its value is preset by the chosen compiler toolchain in the build tree
-    set (URHO3D_64BIT ${URHO3D_DEFAULT_64BIT})
-else ()
-    option (URHO3D_64BIT "Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system" ${URHO3D_DEFAULT_64BIT})
-endif ()
+cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${URHO3D_DEFAULT_64BIT} "NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN" ${URHO3D_DEFAULT_64BIT})
 cmake_dependent_option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 cmake_dependent_option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)" FALSE "NOT EMSCRIPTEN" FALSE)
@@ -607,11 +611,6 @@ else ()
             endif ()
             set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
-            if (DEFINED ENV{CI})
-                # Our CI server is slow, so do not optimize and discard all debug info when test building in Debug configuration
-                set (CMAKE_C_FLAGS_DEBUG "-g0")
-                set (CMAKE_CXX_FLAGS_DEBUG "-g0")
-            endif ()
             # CMake does not treat Emscripten as a valid platform yet, certain platform-specific variables cannot be set in the
             # toolchain file as they get overwritten by CMake internally as per Linux platform default, so set them here for now
             set (CMAKE_EXECUTABLE_SUFFIX .html)
@@ -626,7 +625,7 @@ else ()
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
                 else ()
-                    if (DEFINED ENV{CI})
+                    if (DEFINED ENV{TRAVIS})
                         # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
                         set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-tree-slp-vectorize -fno-tree-vectorize")
                         set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-tree-slp-vectorize -fno-tree-vectorize")
@@ -652,7 +651,7 @@ else ()
         endif ()
         # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
         # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
-        if (DEFINED ENV{CI} AND "$ENV{LINUX}")
+        if (DEFINED ENV{TRAVIS} AND "$ENV{LINUX}")
             add_definitions (-D__extern_always_inline=inline)
         endif ()
     endif ()
@@ -1094,9 +1093,7 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
     endif ()
     set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
     set (${LINKER_FLAGS}_RELEASE "${${LINKER_FLAGS}_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
-    if (NOT DEFINED ENV{CI})
-        set (${LINKER_FLAGS}_DEBUG "${${LINKER_FLAGS}_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
-    endif ()
+    set (${LINKER_FLAGS}_DEBUG "${${LINKER_FLAGS}_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
     if (URHO3D_TESTING)
         set (${LINKER_FLAGS} "${${LINKER_FLAGS}} --emrun")  # Inject code into the generated Module object to enable capture of stdout, stderr and exit()
     endif ()
@@ -1385,7 +1382,7 @@ macro (setup_test)
         list (APPEND ARG_OPTIONS -timeout ${URHO3D_TEST_TIMEOUT})
         if (EMSCRIPTEN)
             if (DEFINED ENV{CI})
-                # The latency on Travis CI server could be very high at time, so add some adjustment
+                # The latency on CI server could be very high at time, so add some adjustment
                 # If it is not enough causing a test case failure then so be it because it is better that than wait for it and still ends up in build error due to time limit
                 set (EMRUN_TIMEOUT_ADJUSTMENT + 8 * \\${URHO3D_TEST_TIMEOUT})
                 set (EMRUN_TIMEOUT_RETURNCODE --timeout_returncode 0)
@@ -1705,6 +1702,8 @@ elseif (EMSCRIPTEN)
         file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
     endif ()
 else ()
+    # Ensure the output directory exist before creating the symlinks
+    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     # Create symbolic links in the build tree
     foreach (I CoreData Data)
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I})

@@ -5,6 +5,13 @@ namespace Urho3D
 
 \page EventList Event list
 
+## %Audio events
+
+### SoundFinished
+- %Node : Node pointer
+- %SoundSource : SoundSource pointer
+- %Sound : Sound pointer
+
 ## %Core events
 
 ### BeginFrame
@@ -44,9 +51,20 @@ namespace Urho3D
 
 ### AnimationTrigger
 - %Node : Node pointer
+- %Animation : Animation pointer
 - %Name : String
 - %Time : Float
 - %Data : User-defined data type
+
+### AnimationFinished
+- %Node : Node pointer
+- %Animation : Animation pointer
+- %Name : String
+- %Looped : Bool
+
+### ParticleEffectFinished
+- %Node : Node pointer
+- %Effect : ParticleEffect pointer
 
 ### TerrainCreated
 - %Node : Node pointer

@@ -372,6 +372,10 @@ static const int HAT_UP;
 static const int HAT_RIGHT;
 static const int HAT_DOWN;
 static const int HAT_LEFT;
+static const int HAT_RIGHTUP;
+static const int HAT_RIGHTDOWN;
+static const int HAT_LEFTUP;
+static const int HAT_LEFTDOWN;
 
 static const int CONTROLLER_BUTTON_A;
 static const int CONTROLLER_BUTTON_B;

@@ -596,6 +596,10 @@ static const int HAT_UP = SDL_HAT_UP;
 static const int HAT_RIGHT = SDL_HAT_RIGHT;
 static const int HAT_DOWN = SDL_HAT_DOWN;
 static const int HAT_LEFT = SDL_HAT_LEFT;
+static const int HAT_RIGHTUP = SDL_HAT_RIGHTUP;
+static const int HAT_RIGHTDOWN = SDL_HAT_RIGHTDOWN;
+static const int HAT_LEFTUP = SDL_HAT_LEFTUP;
+static const int HAT_LEFTDOWN = SDL_HAT_LEFTDOWN;
 
 static const int CONTROLLER_BUTTON_A = SDL_CONTROLLER_BUTTON_A;
 static const int CONTROLLER_BUTTON_B = SDL_CONTROLLER_BUTTON_B;
